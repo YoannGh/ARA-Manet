@@ -1,4 +1,4 @@
-package manet;
+package solution.exo1;
 
 import manet.positioning.PositionProtocol;
 import manet.positioning.PositionProtocolImpl;
