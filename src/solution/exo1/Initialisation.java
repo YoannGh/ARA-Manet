@@ -26,9 +26,7 @@ public class Initialisation implements Control {
 			//Démarrer le déplacement des noeuds
 			EDSimulator.add(1, PositionProtocolImpl.loop_event, dest, positionprotocol_pid);
 			//Démarrer l'envoi des Messages Probe
-			EDSimulator.add(1, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, dest, neighborprotocol_pid);
-			//Démarrer les TimeOut
-			EDSimulator.add(1, NeighborProtocolImpl.TIMEOUT_EVENT, dest, neighborprotocol_pid);
+			EDSimulator.add(2, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, dest, neighborprotocol_pid);
 		}
 		return false;
 	}

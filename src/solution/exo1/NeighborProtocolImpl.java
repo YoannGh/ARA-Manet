@@ -82,14 +82,13 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 				for(int i = 0; i < Network.size(); i++) {
 					Node dest = Network.get(i);
-					if(dest.getID() != my_pid) {
-						Message probeMsg = new Message(my_pid, dest.getID(), MSG_TAG_PROBE, new Integer(current_probe_id) , my_pid);
+					if(dest.getID() != node.getID()) {
+						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, new Integer(current_probe_id) , my_pid);
 						Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
 						//Envoi du Probe
 						emitter.emit(node, probeMsg);
 					}
 				}
-
 				//Armer l'envoi du prochain Probe
 				EDSimulator.add(probe_period, DO_HEARTBEAT_EVENT, node, my_pid);
 				return;
@@ -106,26 +105,29 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 							((NeighborhoodListener)node.getProtocol(neightbor_listener_pid)).lostNeighborDetected(node, m.getIdSrc());
 					}
 				}
-				// Armer le prochain TimeOut
-				EDSimulator.add(timeout, TIMEOUT_EVENT, node, my_pid);
 				return;
 			}
 		}
 		else if(event instanceof Message) {
 			Message msg = (Message) event;
-			// Réception d'un Probe
-			if(msg.getTag().equals(MSG_TAG_PROBE)) {
-				neighbors_msg.add(msg);
-				Integer msg_probe_id = (Integer) msg.getContent();
-				if(msg_probe_id == current_probe_id) {
-					if(!neighbors_ids.contains(msg.getIdSrc())) {
-						neighbors_ids.add(msg.getIdSrc());
-						if(neightbor_listener_pid != -1)
-							((NeighborhoodListener)node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
+			if(msg.getIdDest() == node.getID()) {
+				// Réception d'un Probe
+				if (msg.getTag().equals(MSG_TAG_PROBE)) {
+					System.out.println("Probe reçu par " + node.getID() + " venant de " + msg.getIdSrc());
+					neighbors_msg.add(msg);
+					Integer msg_probe_id = (Integer) msg.getContent();
+					if (msg_probe_id == current_probe_id) {
+						if (!neighbors_ids.contains(msg.getIdSrc())) {
+							neighbors_ids.add(msg.getIdSrc());
+							if (neightbor_listener_pid != -1)
+								((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
+						}
 					}
+					// Armer le prochain TimeOut
+					EDSimulator.add(timeout, TIMEOUT_EVENT, node, my_pid);
 				}
-				return;
 			}
+			return;
 		}
 		System.out.println("Received unknown event: " + event);
 		throw new RuntimeException("Receive unknown Event");
