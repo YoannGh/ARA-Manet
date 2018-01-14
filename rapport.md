@@ -2,6 +2,7 @@
 
 ## Question 1
 
+Donnez l'algorithme général de déplacement d'un noeud:
 ```
 Initialement le noeud n'est pas en mouvement.
 
@@ -21,7 +22,7 @@ Sinon:
 ```
 
 ## Question 2
-
+Contenu du fichier config.cfg pour cette question:
 ```
 random.seed 6
 network.size 42
@@ -48,6 +49,10 @@ init.init_module Initialisation
 ```
 
 ## Question 3
+
+- SD: Stratégie déplacement
+- SPI: Stratégie Position Initiale
+
 Le SD définit une position pseudo aléatoire comprise entre les paramètres width et height définis dans le fichier de config.
 La SPI de la Stratégie 1 appelle simplement le SD avec une vitesse de zéro.
 
@@ -56,8 +61,12 @@ La SPI de la Stratégie 1 appelle simplement le SD avec une vitesse de zéro.
 
 Le SD de la stratégie 2 retourne la position actuelle du noeud. Les noeuds sont donc statiques.
 
+## Question 5
+
 ```java
 public class EmitterImpl implements Emitter {
+
+	private static final String pp_PID = "positionprotocolimpl";
 	
 	private static final String PAR_LATENCY="latency";
 	private static final String PAR_SCOPE="scope";
@@ -76,7 +85,23 @@ public class EmitterImpl implements Emitter {
 
 	@Override
 	public void emit(Node host, Message msg) {
-		EDSimulator.add(latency, msg.getTag(), host, msg.getPid());
+		int positionprotocol_pid = Configuration.lookupPid(pp_PID);
+		PositionProtocol ppEmitter = (PositionProtocol) host.getProtocol(positionprotocol_pid);
+		Position positionEmitter = ppEmitter.getCurrentPosition();
+
+		for(int i = 0; i < Network.size(); i++) {
+			Node n = Network.get(i);
+			if(n.getID() != host.getID()) {
+				PositionProtocol ppNode = (PositionProtocol) n.getProtocol(positionprotocol_pid);
+				Position positionNode = ppNode.getCurrentPosition();
+				double distance = Math.hypot(	positionEmitter.getX()-positionNode.getX(),
+												positionEmitter.getY()-positionNode.getY());
+
+				if (distance <= scope) {
+					EDSimulator.add(latency, msg, host, msg.getPid());
+				}
+			}
+		}
 	}
 
 	@Override
@@ -93,8 +118,11 @@ public class EmitterImpl implements Emitter {
 		EmitterImpl res=null;
 		try {
 			res=(EmitterImpl)super.clone();
+			res.latency = latency;
+			res.scope = scope;
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
+
 }
 ```
