@@ -66,6 +66,9 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			res.probe_period = probe_period;
 			res.emitter_pid = emitter_pid;
 			res.neightbor_listener_pid = neightbor_listener_pid;
+			res.current_probe_id = current_probe_id;
+			res.neighbors_msg = new ArrayList<>(neighbors_msg);
+			res.neighbors_ids = new ArrayList<>(neighbors_ids);
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
@@ -113,11 +116,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			if(msg.getIdDest() == node.getID()) {
 				// Réception d'un Probe
 				if (msg.getTag().equals(MSG_TAG_PROBE)) {
-					System.out.println("Probe reçu par " + node.getID() + " venant de " + msg.getIdSrc());
-					neighbors_msg.add(msg);
 					Integer msg_probe_id = (Integer) msg.getContent();
 					if (msg_probe_id == current_probe_id) {
 						if (!neighbors_ids.contains(msg.getIdSrc())) {
+							neighbors_msg.add(msg);
 							neighbors_ids.add(msg.getIdSrc());
 							if (neightbor_listener_pid != -1)
 								((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());

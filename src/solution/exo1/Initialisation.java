@@ -20,13 +20,13 @@ public class Initialisation implements Control {
 		int positionprotocol_pid = Configuration.lookupPid(pp_PID);
 		int neighborprotocol_pid = Configuration.lookupPid(np_PID);
 		for(int i = 0; i < Network.size(); i++) {
-			Node dest = Network.get(i);
-			PositionProtocol pp = (PositionProtocolImpl) dest.getProtocol(positionprotocol_pid);
-			pp.initialiseCurrentPosition(dest);
+			Node n = Network.get(i);
+			PositionProtocol pp = (PositionProtocolImpl) n.getProtocol(positionprotocol_pid);
+			pp.initialiseCurrentPosition(n);
 			//Démarrer le déplacement des noeuds
-			EDSimulator.add(1, PositionProtocolImpl.loop_event, dest, positionprotocol_pid);
+			EDSimulator.add(1, PositionProtocolImpl.loop_event, n, positionprotocol_pid);
 			//Démarrer l'envoi des Messages Probe
-			EDSimulator.add(2, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, dest, neighborprotocol_pid);
+			EDSimulator.add(1, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, n, neighborprotocol_pid);
 		}
 		return false;
 	}

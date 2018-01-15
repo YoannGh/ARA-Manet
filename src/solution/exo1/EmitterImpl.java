@@ -44,7 +44,6 @@ public class EmitterImpl implements Emitter {
 												positionEmitter.getY()-positionNode.getY());
 
 				if (distance <= scope) {
-					System.out.println("Distance entre " + host.getID() + " et " + n.getID() + ": " + distance);
 					EDSimulator.add(latency, msg, n, msg.getPid());
 				}
 			}
