@@ -250,3 +250,25 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 }
 ```
+
+## Question 8
+- Stratégie 3
+  Cette SD repose sur le paramètre scope, définissant une zone de deplacements carré centrée sur le milieu de la fenêtre.
+  La taille de la zone est définie par la formule: (scope-20)*2
+  Si scope < 20, la zone est de taille 0, tous les noeuds sont donc statiques au milieux de la fenêtre.
+  Dans le pire des cas, les noeuds peuvent être de part et d'autre de la diagonale du carré, soit à une distance de n*\sqrt{2}, avec n etant la taille d'un coté de la zone.
+  Ce qui revient à résoudre l'inégalité suivante:
+  ((scope-20)*2)*\sqrt{2} < scope
+  Après simplification:
+  scope < ~30.93
+  Le graphe est donc connexe pour un scope de 0 à 30.
+
+- Stratégie 4
+  //todo
+
+- Stratégie 5
+  Cette SPI garantie que la distance maximum entre deux noeuds est bornée par le mimimum entre le scope et le parametre distance_init_max. 
+  La SPI génère donc un graphe connexe.
+
+- Stratégie 6
+  Cette SPI forme une topologie en "étoile" autour du centre de la fenêtre. L'angle de chaque noeud est calculé en fonction de son ID, et la distance depuis le centre est calculé en fonction du scope et de la taille du réseau, garantissant de générer un graphe connexe.

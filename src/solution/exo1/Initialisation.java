@@ -12,6 +12,7 @@ public class Initialisation implements Control {
 	
 	private static final String pp_PID = "positionprotocolimpl";
 	private static final String np_PID = "neighborprotocolimpl";
+	private static final String dc_PID = "densitycontrolerimpl";
 	
 	public  Initialisation(String prefix) {}
 	
@@ -19,6 +20,7 @@ public class Initialisation implements Control {
 	public boolean execute() {
 		int positionprotocol_pid = Configuration.lookupPid(pp_PID);
 		int neighborprotocol_pid = Configuration.lookupPid(np_PID);
+		int densitycontroler_pid = Configuration.lookupPid(dc_PID);
 		for(int i = 0; i < Network.size(); i++) {
 			Node n = Network.get(i);
 			PositionProtocol pp = (PositionProtocolImpl) n.getProtocol(positionprotocol_pid);
@@ -28,6 +30,8 @@ public class Initialisation implements Control {
 			//Démarrer l'envoi des Messages Probe
 			EDSimulator.add(1, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, n, neighborprotocol_pid);
 		}
+		//Démarrer le density controller
+		EDSimulator.add(1, DensityControler.loop_event, Network.get(0), densitycontroler_pid);
 		return false;
 	}
 }
