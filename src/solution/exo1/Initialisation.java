@@ -31,7 +31,7 @@ public class Initialisation implements Control {
 			EDSimulator.add(1, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, n, neighborprotocol_pid);
 		}
 		//Démarrer le density controller
-		EDSimulator.add(1, DensityControler.loop_event, Network.get(0), densitycontroler_pid);
+		EDSimulator.add(1, DensityControler.init_event, Network.get(0), densitycontroler_pid);
 		return false;
 	}
 }

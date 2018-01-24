@@ -28,9 +28,9 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 	private static final String PAR_TIMEOUT="timeout";
 	private static final String PAR_EMITTER="emitter";
 	private static final String PAR_NEIGHBOR_LISTENER="neighbor_listener";
-	
+
 	private final int my_pid;
-	
+
 	private int timeout;
 	private long probe_period;
 	private int emitter_pid;
@@ -39,7 +39,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 	private List<Message> neighbors_msg;
 	private List<Long> neighbors_ids;
-	
+
 	public NeighborProtocolImpl(String prefix){
 		String tmp[]=prefix.split("\\.");
 		my_pid=Configuration.lookupPid(tmp[tmp.length-1]);
@@ -47,7 +47,6 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		this.timeout=Configuration.getInt(prefix+"."+PAR_TIMEOUT);
 		this.emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTER);
 		this.neightbor_listener_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBOR_LISTENER, -1);
-
 		neighbors_msg = new LinkedList<>();
 		neighbors_ids = new LinkedList<>();
 
