@@ -1,125 +1,95 @@
 package solution.exo1;
 
-import java.util.Vector;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 import peersim.config.Configuration;
+
+import peersim.core.Control;
 import peersim.core.Network;
-import peersim.core.Node;
 import peersim.core.CommonState;
-import peersim.edsim.EDProtocol;
-import peersim.edsim.EDSimulator;
+import peersim.core.Node;
 
-public class DensityControler implements EDProtocol{
-	
-	public static final String init_event="INIT";
-	public static final String loop_event="LOOPEVENT";
-	public static final String trig_event="TRIGEVENT";
 
-	private static final String PAR_FIRST_TRIGGER="firstTrigger";
-	private static final String PAR_PERIOD ="period";
+public class DensityControler implements Control{
+
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
+	private static final String np_PID = "neighborprotocolimpl";
 
-	private final int my_pid;
 	private final int neighbor_pid;
-
-	private int period;
-	private int firstTrigger;
-	private Vector<Vector<Integer>> neighborTrace;
+	private final int period;
+	private double totalAvgNei = 0;
+	private double totalStandVar = 0;
+	private ArrayList<Double> avg_trace = new ArrayList<Double>();
 
 	public DensityControler(String prefix) {
-		String tmp[]=prefix.split("\\.");
-		my_pid=Configuration.lookupPid(tmp[tmp.length-1]);
-		this.firstTrigger=Configuration.getInt(prefix+"."+PAR_FIRST_TRIGGER);
-		this.period=Configuration.getInt(prefix+"."+PAR_PERIOD);
-		//this.neighbor_pid=Configuration.getInt(prefix+"."+PAR_NEIGHBORPID, -1);
-		//todo FIX THIS
-		this.neighbor_pid = 3;
-		initBuffers();
+		//this.neighbor_pid=Configuration.getInt(prefix+"."+PAR_NEIGHBORPID);
+		this.neighbor_pid = Configuration.lookupPid(np_PID);
+		this.period = Configuration.getInt(prefix+"."+"step");
+		System.out.println("period = " + period);
 	}
 
-	
-	
-	@Override
-	public void processEvent(Node node, int pid, Object event) {
-		if(pid != my_pid){
-			throw new RuntimeException("Receive Event for wrong protocol");
-		}
-		if(event instanceof String) {
-			String ev = (String)event;
-			if(ev.equals(loop_event)) {
-				update();
-				EDSimulator.add(1, loop_event, node, my_pid);
-			}
-			else if (ev.equals(trig_event)) {
-				process_trigger();
-				EDSimulator.add(period, trig_event, node, my_pid);
-			}
-			else if (ev.equals(init_event)) {
-				EDSimulator.add(firstTrigger, loop_event, node, my_pid);
-				EDSimulator.add(firstTrigger + period, trig_event, node, my_pid);
-			}
-			return;
-		}
-		System.out.println("Received unknown event: " + event);
-		throw new RuntimeException("Receive unknown Event");
-	}
-
-	private void update() {
-		for(int i = 0; i < Network.size(); i++) {
+	private double avgNei() {
+		double avg = 0;
+		for(int i = 0 ; i< Network.size() ; i++){
 			Node n = Network.get(i);
 			NeighborProtocolImpl npi = (NeighborProtocolImpl) n.getProtocol(neighbor_pid);
-			neighborTrace.get(i).addElement(npi.getNeighbors().size());
+			avg += npi.getNeighbors().size();
 		}
+		avg /= Network.size();
+		totalAvgNei+=avg;
+		avg_trace.add(avg);
+		return avg;
 	}
 
-	private void process_trigger() {
-		Vector<Float> avgNeihbor = new Vector<Float>();
-		float accAvg, accET, totAvg, totET, totED;
-		totAvg = totET = totED = 0;
-
-		//Calculation of all Di(t) and D(t)
-		for(int i = 0; i < Network.size(); i++) {
-			accAvg = 0;
-			for(int val : neighborTrace.get(i)) {
-				accAvg+= val;
-			}
-			accAvg /= neighborTrace.get(i).size();
-			avgNeihbor.addElement(accAvg);
-			totAvg+=accAvg;
-		}
-		totAvg /= Network.size();
-
-		//Calculation of all Ei(t) and E(t)
-		for(int i = 0; i < Network.size(); i++) {
-			accET = 0;
-			for(int j : neighborTrace.get(i)) {
-				accET+= Math.pow(j-avgNeihbor.get(i), 2);
-			}
-			totET += Math.sqrt(accET/neighborTrace.get(i).size());
-		}
-		totET /= Network.size();
-
-		//Calcul of DE(t)
-
-		System.out.println("Portée | SPI | SD | D(t) | E(t)/D(t) | ED(t)/D(t)");
-		System.out.println("| | | " + totAvg + " | " + totET/totAvg + " | " + totED/1);
-		initBuffers();
+	private double avgNeiSinceStartup() {
+		return totalAvgNei/avg_trace.size();
 	}
 
-	private void initBuffers() {
-		this.neighborTrace = new Vector<Vector<Integer>>();
-		for(int i = 0; i < Network.size(); i++) {
-			neighborTrace.addElement(new Vector<Integer>());
+	private void standardVariation() {
+		double avg = totalAvgNei/avg_trace.size();
+		double sv = 0;
+		for(int i = 0 ; i< Network.size() ; i++){
+			Node n = Network.get(i);
+			NeighborProtocolImpl npi = (NeighborProtocolImpl) n.getProtocol(neighbor_pid);
+			sv += Math.pow((npi.getNeighbors().size() - avg), 2);
 		}
+		totalStandVar += Math.sqrt(sv);
 	}
 
+	private double avgStandVarSinceStartup() {
+		return totalStandVar/avg_trace.size();
+	}
 
+	private double ED(){
+		double value = 0;
+		for(double i : avg_trace){
+			value += Math.pow(i-avgNeiSinceStartup(),2);
+		}
+		value =value/avg_trace.size();
+		return Math.sqrt(value);
+	}
+
+	@Override
+	public boolean execute() {
+		avgNei();
+		standardVariation();
+
+		if(CommonState.getTime() >= (CommonState.getEndTime() - period)) {
+			double dt = avgNeiSinceStartup();
+			NumberFormat formatter = new DecimalFormat("#0.00");
+			System.out.println("D(t): " + formatter.format(dt));
+			System.out.println("E(t)/D(t): " + formatter.format((avgStandVarSinceStartup() / dt)));
+			System.out.println("ED(t)/D(t): " + formatter.format((ED() / dt)));
+		}
+		return false;
+	}
 
 	public Object clone(){
 		DensityControler res=null;
 		try {
 			res=(DensityControler)super.clone();
-			res.period = period;
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
