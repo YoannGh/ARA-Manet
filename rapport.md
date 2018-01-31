@@ -264,7 +264,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
   Le graphe est donc connexe pour un scope de 0 à 30.
 
 - Stratégie 4
-  //todo
+  Si le graphe est connexe à l'initialisation, deplace les noeuds dans la zone tout en conservant la propriété connexe du graphe.
 
 - Stratégie 5
   Cette SPI garantie que la distance maximum entre deux noeuds est bornée par le mimimum entre le scope et le parametre distance_init_max. 
@@ -272,3 +272,33 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 - Stratégie 6
   Cette SPI forme une topologie en "étoile" autour du centre de la fenêtre. L'angle de chaque noeud est calculé en fonction de son ID, et la distance depuis le centre est calculé en fonction du scope et de la taille du réseau, garantissant de générer un graphe connexe.
+
+## Question 10
+
+
+| portée | SPI | SD | D(t) | \frac{E(t)}{D(T)} | \frac{ED(t)}{D(T)} |
+|--------|-----|----|------|-------------------|--------------------|
+|     125|    1|   1|  0.63|               9.08|                0.27|
+|     250|    1|   1|  2.24|               5.54|                0.18|
+|     375|    1|   1|  4.59|               4.47|                0.17|
+|     500|    1|   1|  7.26|               3.92|                0.14|
+|     625|    1|   1| 10.73|               3.59|                0.16|
+|     750|    1|   1| 13.31|               3.26|                0.15|
+|     875|    1|   1| 16.03|               2.90|                0.10|
+|    1000|    1|   1| 18.71|               2.56|                0.11|
+|        |     |    |      |                   |                    |
+|     125|    3|   3| 16.30|               3.10|                0.15|
+|     250|    3|   3| 14.73|               3.16|                0.14|
+|     375|    3|   3| 13.61|               3.28|                0.15|
+|     500|    3|   3| 13.61|               3.29|                0.13|
+|     625|    3|   3| 13.60|               3.20|                0.12|
+|     750|    3|   3| 13.59|               3.18|                0.11|
+|     875|    3|   3| 13.79|               3.20|                0.11|
+|    1000|    3|   3| 13.52|               3.25|                0.13|
+
+## Question 11
+
+- Stratégie 1:
+  La taille de la zone étant fixe, l'augmentation de la portée est donc directement proportionnelle avec celui de la densité.
+- Stratégie 2:
+  La taille de la zone de déplacements augmente proportionnelement avec le scope, la densité reste donc constante avec l'augmentation de la portée.

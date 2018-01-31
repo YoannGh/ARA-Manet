@@ -19,6 +19,7 @@ public class DensityControler implements Control{
 
 	private final int neighbor_pid;
 	private final int period;
+	private final int range;
 	private double totalAvgNei = 0;
 	private double totalStandVar = 0;
 	private ArrayList<Double> avg_trace = new ArrayList<Double>();
@@ -27,7 +28,7 @@ public class DensityControler implements Control{
 		//this.neighbor_pid=Configuration.getInt(prefix+"."+PAR_NEIGHBORPID);
 		this.neighbor_pid = Configuration.lookupPid(np_PID);
 		this.period = Configuration.getInt(prefix+"."+"step");
-		System.out.println("period = " + period);
+		this.range = Configuration.getInt(prefix+"."+"range", -1);
 	}
 
 	private double avgNei() {
@@ -82,6 +83,9 @@ public class DensityControler implements Control{
 			System.out.println("D(t): " + formatter.format(dt));
 			System.out.println("E(t)/D(t): " + formatter.format((avgStandVarSinceStartup() / dt)));
 			System.out.println("ED(t)/D(t): " + formatter.format((ED() / dt)));
+			System.out.println("|     " + range + "|    3|   3| " + formatter.format(dt) + "|               " +
+								formatter.format((avgStandVarSinceStartup() / dt))	+ "|                " +
+								formatter.format((ED() / dt)) + "|");
 		}
 		return false;
 	}
