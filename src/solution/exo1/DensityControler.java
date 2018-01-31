@@ -76,16 +76,19 @@ public class DensityControler implements Control{
 	public boolean execute() {
 		avgNei();
 		standardVariation();
+		NumberFormat formatter = new DecimalFormat("#0.00");
+		
+		System.out.println(formatter.format((double)CommonState.getTime() * 100 / CommonState.getEndTime()) + "%");
 
 		if(CommonState.getTime() >= (CommonState.getEndTime() - period)) {
 			double dt = avgNeiSinceStartup();
-			NumberFormat formatter = new DecimalFormat("#0.00");
 			System.out.println("D(t): " + formatter.format(dt));
 			System.out.println("E(t)/D(t): " + formatter.format((avgStandVarSinceStartup() / dt)));
 			System.out.println("ED(t)/D(t): " + formatter.format((ED() / dt)));
-			System.out.println("|     " + range + "|    3|   3| " + formatter.format(dt) + "|               " +
-								formatter.format((avgStandVarSinceStartup() / dt))	+ "|                " +
-								formatter.format((ED() / dt)) + "|");
+//			System.out.println("|     " + range + "|    3|   3| " + formatter.format(dt) + "|               " +
+//								formatter.format((avgStandVarSinceStartup() / dt))	+ "|                " +
+//								formatter.format((ED() / dt)) + "|");
+			System.out.println("|                " + range + "|  " + formatter.format(dt) + "|               " + formatter.format((ED() / dt)) + "|");
 		}
 		return false;
 	}

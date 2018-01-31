@@ -302,3 +302,16 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
   La taille de la zone étant fixe, l'augmentation de la portée est donc directement proportionnelle avec celui de la densité.
 - Stratégie 2:
   La taille de la zone de déplacements augmente proportionnelement avec le scope, la densité reste donc constante avec l'augmentation de la portée.
+  
+  
+# exercice 2
+
+##Question 1
+
+/TODO
+| Taille du réseau | D(t) | \frac{E(t)}{D(T)} |
+|------------------|------|-------------------|
+|                20|  3.18|               0.28|
+|                30|  4.90|               0.38|
+
+##Question 2
