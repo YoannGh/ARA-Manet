@@ -8,57 +8,43 @@ import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
-import peersim.edsim.EDSimulator;
 import solution.exo1.DensityControler;
-import solution.exo1.NeighborProtocolImpl;
 
 public class GossipControler implements Control{
 
 	private static final String PAR_GOSSIPPID ="gossipprotocol";
+	private static final String PAR_EMITTER ="emitter";
 	private static final String PAR_N ="N";
 
 	private static int gossip_pid;
+	private static int emitter_pid;
 	private static int N;
+
 	private int currBroadcast = 0;
 	private int totalAtt = 0;
 	private int totalER = 0;
+	private int currRecv = 0;
+	private int currSend = 0;
 	private ArrayList<Double> att_trace = new ArrayList<Double>();
 	private ArrayList<Double> er_trace = new ArrayList<Double>();
 
 	public GossipControler(String prefix) {
-		this.gossip_pid=Configuration.getInt(prefix+"."+PAR_GOSSIPPID);
-		this.N = Configuration.getInt(prefix+"."+PAR_N);
+		GossipControler.N = Configuration.getInt(prefix+"."+PAR_N);
+		GossipControler.emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTER);
+		GossipControler.gossip_pid=Configuration.getPid(prefix+"."+PAR_GOSSIPPID);
 	}
 
 	public void processAtt() {
 		double att = 0;
-		for(int i = 0 ; i< Network.size() ; i++){
-			Node n = Network.get(i);
-			GossipProtocolImpl gpi = (GossipProtocolImpl) n.getProtocol(gossip_pid);
-			if(gpi.getAtt())
-				att+=1;
-			gpi.setGossip(0);
-		}
-		att = att/Network.size()*100;
+		att = currRecv/Network.size()*100;
 		totalAtt+= att;
 		att_trace.add(att);
 	}
 
-	public double processER() {
-		double recv = 0;
-		double send = 0;
+	public void processER() {
 		double res;
-
-		for(int i = 0 ; i< Network.size() ; i++){
-			Node n = Network.get(i);
-			GossipProtocolImpl gpi = (GossipProtocolImpl) n.getProtocol(gossip_pid);
-			if(gpi.getGossip())
-				recv+=1;
-			if(gpi.getGossip())
-				send+=1;
-			gpi.setGossip(0);
-			gpi.setGossip(0);
-		}
+		double recv = currRecv;
+		double send = currSend;
 		res = (recv - send)/ recv;
 		totalER+= res;
 		er_trace.add(res);
@@ -84,29 +70,51 @@ public class GossipControler implements Control{
 		return Math.sqrt(sv);
 	}
 
-
-
-
 	@Override
 	public boolean execute() {
-		if()
-		if( broadcastDone() && (currBroadcast < N)) {
-			currBroadcast+=1;
-			Node initialNode = Network.get(CommonState.r.nextInt(Network.size()));
-			GossipProtocol gp = (GossipProtocol) initialNode.getProtocol(gossip_pid);
-			gp.initiateGossip(initialNode, currBroadcast, initialNode.getID());
-		}
+		if(broadcastDone()) {
+			if(currBroadcast > 0) {
+				processAtt();
+				processER();
+			}
+			if(currBroadcast < N) {
+				Node initialNode = Network.get(CommonState.r.nextInt(Network.size()));
+				GossipProtocol gp = (GossipProtocol) initialNode.getProtocol(gossip_pid);
+				System.out.println("initializing gossip#" + currBroadcast + " from node " + initialNode.getID());
+				gp.initiateGossip(initialNode, currBroadcast, initialNode.getID());
+				currBroadcast+=1;
+				return false;
+			}
 
-		if(broadcastDone() && currBroadcast == N) {
-			System.out.println("Avgatt = " + totalAtt/att_trace.size());
-			System.out.println("Avger = " + totalER/er_trace.size());
-			System.out.println("Eatt = " + standardVariationAtt());
-			System.out.println("Eer = " + standardVariationER());
+			if(currBroadcast == N) {
+				System.out.println("Avgatt = " + totalAtt/att_trace.size()+ "%");
+				System.out.println("Avger = " + totalER/er_trace.size()+ "%");
+				System.out.println("Eatt = " + standardVariationAtt());
+				System.out.println("Eer = " + standardVariationER());
+				System.out.println("Done");
+				System.exit(1);
+			}
 		}
 
 		return false;
 	}
 
+	//Broadcast is done when the sum of all recv equals the sum of all send - 1 (initiator node)
+	private boolean broadcastDone() {
+		int totalrecv = 0;
+		int totalsend = 0;
+		currRecv = currSend = 0;
+		for(int i = 0 ; i< Network.size() ; i++){
+			Node n = Network.get(i);
+			EmitterGossip eg = (EmitterGossip) n.getProtocol(emitter_pid);
+			totalrecv += eg.getRecv();
+			totalsend += eg.getSend();
+			currRecv += (eg.getRecv() == 0) ? 0: 1;
+			currSend += (eg.getSend() == 0) ? 0: 1;
+		}
+//				System.out.println("total: " + totalsend + "/"+ totalrecv +"\n");
+		return (totalsend == 0) || (totalsend+1 == totalrecv);
+	}
 
 	public Object clone(){
 		DensityControler res=null;

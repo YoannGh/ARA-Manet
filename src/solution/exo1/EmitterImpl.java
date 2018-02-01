@@ -4,7 +4,6 @@ import manet.Message;
 import manet.communication.Emitter;
 import manet.positioning.Position;
 import manet.positioning.PositionProtocol;
-import manet.positioning.PositionProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Network;
 import peersim.core.Node;
@@ -12,15 +11,15 @@ import peersim.edsim.EDSimulator;
 
 public class EmitterImpl implements Emitter {
 
-	private static final String pp_PID = "positionprotocolimpl";
+	protected static final String pp_PID = "positionprotocolimpl";
 	
 	private static final String PAR_LATENCY="latency";
 	private static final String PAR_SCOPE="scope";
 	
 	private final int my_pid;
 	
-	private int latency;
-	private int scope;
+	protected int latency;
+	protected int scope;
 	
 	public EmitterImpl(String prefix){
 		String tmp[]=prefix.split("\\.");

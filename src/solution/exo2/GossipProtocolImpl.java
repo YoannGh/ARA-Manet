@@ -3,22 +3,20 @@ package solution.exo2;
 import manet.algorithm.gossip.GossipProtocol;
 import manet.communication.Emitter;
 import peersim.config.Configuration;
+import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
-import solution.exo1.DensityControler;
-
-import java.util.LinkedList;
 
 import manet.Message;
 
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
-	
-    private static final String PAR_EMITTER = "emitter";
-    
+
+	private static final String PAR_EMITTER = "emitter";
+
 	public static final String MSG_TAG_GOSSIP = "gossip";
-    
-    private final int my_pid;
-    private final int emitter_pid;
+
+	private final int my_pid;
+	private final int emitter_pid;
 
 	public GossipProtocolImpl(String prefix) {
 		String tmp[]=prefix.split("\\.");
@@ -28,8 +26,16 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 
 	@Override
 	public void initiateGossip(Node node, int id, long id_initiator) {
+
+		for(int i = 0 ; i< Network.size() ; i++){
+			Node n = Network.get(i);
+			EmitterGossip eg = (EmitterGossip) n.getProtocol(emitter_pid);
+			eg.reset();
+		}
+
+
 		Message gossipMsg = new Message(id_initiator, -1, MSG_TAG_GOSSIP, MSG_TAG_GOSSIP, my_pid);
-		Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
+		EmitterGossip emitter = (EmitterGossip) node.getProtocol(emitter_pid);
 		emitter.emit(node, gossipMsg);
 	}
 

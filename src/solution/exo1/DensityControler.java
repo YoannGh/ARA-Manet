@@ -15,7 +15,6 @@ import peersim.core.Node;
 public class DensityControler implements Control{
 
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
-	private static final String np_PID = "neighborprotocolimpl";
 
 	private final int neighbor_pid;
 	private final int period;
@@ -25,8 +24,7 @@ public class DensityControler implements Control{
 	private ArrayList<Double> avg_trace = new ArrayList<Double>();
 
 	public DensityControler(String prefix) {
-		//this.neighbor_pid=Configuration.getInt(prefix+"."+PAR_NEIGHBORPID);
-		this.neighbor_pid = Configuration.lookupPid(np_PID);
+		this.neighbor_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
 		this.period = Configuration.getInt(prefix+"."+"step");
 		this.range = Configuration.getInt(prefix+"."+"range", -1);
 	}
