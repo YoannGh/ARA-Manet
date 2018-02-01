@@ -1,10 +1,5 @@
 package solution.exo1;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import manet.Message;
 import manet.communication.Emitter;
 import manet.detection.NeighborProtocol;
@@ -15,10 +10,10 @@ import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
 
-import javax.net.ssl.ExtendedSSLSession;
+import java.util.*;
 
 public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
-	
+
 	public static final String DO_HEARTBEAT_EVENT = "do_heartbeat";
 	public static final String TIMEOUT_EVENT = "timeout";
 
@@ -35,10 +30,9 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 	private long probe_period;
 	private int emitter_pid;
 	private int neightbor_listener_pid;
-	private int current_probe_id = 1;
 
-	private List<Message> neighbors_msg;
-	private List<Long> neighbors_ids;
+	private Queue<Message> pending_probes;
+	private Map<Long, Integer> received_probes;
 
 	public NeighborProtocolImpl(String prefix){
 		String tmp[]=prefix.split("\\.");
@@ -47,16 +41,15 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		this.timeout=Configuration.getInt(prefix+"."+PAR_TIMEOUT);
 		this.emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTER);
 		this.neightbor_listener_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBOR_LISTENER, -1);
-		neighbors_msg = new LinkedList<>();
-		neighbors_ids = new LinkedList<>();
-
+		pending_probes = new LinkedList<>();
+		received_probes = new HashMap<>();
 	}
-	
+
 	@Override
 	public List<Long> getNeighbors() {
-		return neighbors_ids;
+		return new ArrayList<>(received_probes.keySet());
 	}
-	
+
 	public Object clone(){
 		NeighborProtocolImpl res=null;
 		try {
@@ -65,9 +58,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			res.probe_period = probe_period;
 			res.emitter_pid = emitter_pid;
 			res.neightbor_listener_pid = neightbor_listener_pid;
-			res.current_probe_id = current_probe_id;
-			res.neighbors_msg = new ArrayList<>(neighbors_msg);
-			res.neighbors_ids = new ArrayList<>(neighbors_ids);
+			res.pending_probes = new LinkedList<>(pending_probes);
+			res.received_probes = new HashMap<>(received_probes);
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
@@ -80,12 +72,11 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		if(event instanceof String) {
 			String ev = (String) event;
 			if(ev.equals(DO_HEARTBEAT_EVENT)) {
-				current_probe_id++;
 
 				for(int i = 0; i < Network.size(); i++) {
 					Node dest = Network.get(i);
 					if(dest.getID() != node.getID()) {
-						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, new Integer(current_probe_id) , my_pid);
+						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, null, my_pid);
 						Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
 						//Envoi du Probe
 						emitter.emit(node, probeMsg);
@@ -97,15 +88,23 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			}
 			//Réception d'un évènement TimeOut
 			else if (ev.equals(TIMEOUT_EVENT)) {
-				for(Iterator<Message> itr = neighbors_msg.iterator(); itr.hasNext(); ) {
-					Message m = itr.next();
-					Integer msg_probe_id = (Integer) m.getContent();
-					if(msg_probe_id != current_probe_id) {
-						itr.remove();
-						neighbors_ids.remove(m.getIdSrc());
+
+				Message m = pending_probes.poll();
+				if(m != null) {
+					Integer nbTimeout = received_probes.get(m.getIdSrc()) - 1;
+					if(nbTimeout == 0) {
+						received_probes.remove(m.getIdSrc());
 						if(neightbor_listener_pid != -1)
 							((NeighborhoodListener)node.getProtocol(neightbor_listener_pid)).lostNeighborDetected(node, m.getIdSrc());
 					}
+					else if(nbTimeout > 0) {
+						received_probes.put(m.getIdSrc(), nbTimeout);
+					}
+					else {
+						System.out.println("nbTimeOut = null should not happen");
+					}
+				} else {
+					System.out.println("pending_probes was empty during timeout, this should not happen");
 				}
 				return;
 			}
@@ -115,15 +114,18 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			if(msg.getIdDest() == node.getID()) {
 				// Réception d'un Probe
 				if (msg.getTag().equals(MSG_TAG_PROBE)) {
-					Integer msg_probe_id = (Integer) msg.getContent();
-					if (msg_probe_id == current_probe_id) {
-						if (!neighbors_ids.contains(msg.getIdSrc())) {
-							neighbors_msg.add(msg);
-							neighbors_ids.add(msg.getIdSrc());
-							if (neightbor_listener_pid != -1)
-								((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
-						}
+					System.out.println("Probe reçu par " + node.getID() + " venant de " + msg.getIdSrc());
+
+					pending_probes.offer(msg);
+					Integer nbTimeout = received_probes.get(msg.getIdSrc());
+					if(nbTimeout == null) {
+						received_probes.put(msg.getIdSrc(), 1);
+						if (neightbor_listener_pid != -1)
+							((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
+					} else {
+						received_probes.put(msg.getIdSrc(), nbTimeout + 1);
 					}
+
 					// Armer le prochain TimeOut
 					EDSimulator.add(timeout, TIMEOUT_EVENT, node, my_pid);
 				}
