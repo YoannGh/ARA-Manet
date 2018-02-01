@@ -47,13 +47,14 @@ public class DensityControler implements Control{
 	}
 
 	private void standardVariation() {
-		double avg = totalAvgNei/avg_trace.size();
+		double avg = avg_trace.get(avg_trace.size()-1)/avg_trace.size();
 		double sv = 0;
 		for(int i = 0 ; i< Network.size() ; i++){
 			Node n = Network.get(i);
 			NeighborProtocolImpl npi = (NeighborProtocolImpl) n.getProtocol(neighbor_pid);
 			sv += Math.pow((npi.getNeighbors().size() - avg), 2);
 		}
+		sv = sv/Network.size();
 		totalStandVar += Math.sqrt(sv);
 	}
 
