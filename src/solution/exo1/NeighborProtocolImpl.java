@@ -101,10 +101,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 						received_probes.put(m.getIdSrc(), nbTimeout);
 					}
 					else {
-						System.out.println("nbTimeOut = null should not happen");
+						System.err.println("nbTimeOut = null should not happen");
 					}
 				} else {
-					System.out.println("pending_probes was empty during timeout, this should not happen");
+					System.err.println("pending_probes was empty during timeout, this should not happen");
 				}
 				return;
 			}
@@ -114,7 +114,6 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			if(msg.getIdDest() == node.getID()) {
 				// Réception d'un Probe
 				if (msg.getTag().equals(MSG_TAG_PROBE)) {
-					System.out.println("Probe reçu par " + node.getID() + " venant de " + msg.getIdSrc());
 
 					pending_probes.offer(msg);
 					Integer nbTimeout = received_probes.get(msg.getIdSrc());
@@ -132,7 +131,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			}
 			return;
 		}
-		System.out.println("Received unknown event: " + event);
+		System.err.println("Received unknown event: " + event);
 		throw new RuntimeException("Receive unknown Event");
 	}
 
