@@ -17,6 +17,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 
 	private final int my_pid;
 	private final int emitter_pid;
+	private long sender = -1;
 
 	public GossipProtocolImpl(String prefix) {
 		String tmp[]=prefix.split("\\.");
@@ -31,6 +32,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 			Node n = Network.get(i);
 			EmitterGossip eg = (EmitterGossip) n.getProtocol(emitter_pid);
 			eg.reset();
+			sender = -1;
 		}
 
 
@@ -48,6 +50,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 			Message msg = (Message) event;
 			String ev = msg.getTag();
 			if( ev == MSG_TAG_GOSSIP) {
+				sender = msg.getIdSrc();
 				Message gossipMsg = new Message(node.getID(), -1, MSG_TAG_GOSSIP, MSG_TAG_GOSSIP, my_pid);
 				Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
 				emitter.emit(node, gossipMsg);
@@ -56,6 +59,10 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 		}
 		System.out.println("Received unknown event: " + event);
 		throw new RuntimeException("Receive unknown Event");
+	}
+
+	public long getSender() {
+		return sender;
 	}
 
 	public Object clone(){
