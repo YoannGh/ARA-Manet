@@ -47,6 +47,10 @@ public abstract class EmitterGossip extends EmitterImpl{
 		recvGossip+=1;
 	}
 
+	public void emit(Node host, Message msg) {
+		super.emit(host, msg);
+	}
+
 	public boolean broadcastDone() {
 		return (recvGossip == sendGossip || recvGossip == -1);
 	}

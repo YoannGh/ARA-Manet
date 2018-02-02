@@ -48,7 +48,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 			Message msg = (Message) event;
 			String ev = msg.getTag();
 			if( ev == MSG_TAG_GOSSIP) {
-				Message gossipMsg = new Message(msg.getIdSrc(), -1, MSG_TAG_GOSSIP, MSG_TAG_GOSSIP, my_pid);
+				Message gossipMsg = new Message(node.getID(), -1, MSG_TAG_GOSSIP, MSG_TAG_GOSSIP, my_pid);
 				Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
 				emitter.emit(node, gossipMsg);
 			}
