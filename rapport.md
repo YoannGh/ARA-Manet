@@ -131,7 +131,7 @@ public class EmitterImpl implements Emitter {
 
 ```java
 public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
-	
+
 	public static final String DO_HEARTBEAT_EVENT = "do_heartbeat";
 	public static final String TIMEOUT_EVENT = "timeout";
 
@@ -141,18 +141,17 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 	private static final String PAR_TIMEOUT="timeout";
 	private static final String PAR_EMITTER="emitter";
 	private static final String PAR_NEIGHBOR_LISTENER="neighbor_listener";
-	
+
 	private final int my_pid;
-	
+
 	private int timeout;
 	private long probe_period;
 	private int emitter_pid;
 	private int neightbor_listener_pid;
-	private int current_probe_id = 1;
 
-	private List<Message> neighbors_msg;
-	private List<Long> neighbors_ids;
-	
+	private Queue<Message> pending_probes;
+	private Map<Long, Integer> received_probes;
+
 	public NeighborProtocolImpl(String prefix){
 		String tmp[]=prefix.split("\\.");
 		my_pid=Configuration.lookupPid(tmp[tmp.length-1]);
@@ -160,17 +159,15 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		this.timeout=Configuration.getInt(prefix+"."+PAR_TIMEOUT);
 		this.emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTER);
 		this.neightbor_listener_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBOR_LISTENER, -1);
-
-		neighbors_msg = new LinkedList<>();
-		neighbors_ids = new LinkedList<>();
-
+		pending_probes = new LinkedList<>();
+		received_probes = new HashMap<>();
 	}
-	
+
 	@Override
 	public List<Long> getNeighbors() {
-		return neighbors_ids;
+		return new ArrayList<>(received_probes.keySet());
 	}
-	
+
 	public Object clone(){
 		NeighborProtocolImpl res=null;
 		try {
@@ -179,9 +176,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			res.probe_period = probe_period;
 			res.emitter_pid = emitter_pid;
 			res.neightbor_listener_pid = neightbor_listener_pid;
-			res.current_probe_id = current_probe_id;
-			res.neighbors_msg = new ArrayList<>(neighbors_msg);
-			res.neighbors_ids = new ArrayList<>(neighbors_ids);
+			res.pending_probes = new LinkedList<>(pending_probes);
+			res.received_probes = new HashMap<>(received_probes);
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
@@ -194,12 +190,11 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		if(event instanceof String) {
 			String ev = (String) event;
 			if(ev.equals(DO_HEARTBEAT_EVENT)) {
-				current_probe_id++;
 
 				for(int i = 0; i < Network.size(); i++) {
 					Node dest = Network.get(i);
 					if(dest.getID() != node.getID()) {
-						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, new Integer(current_probe_id) , my_pid);
+						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, null, my_pid);
 						Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
 						//Envoi du Probe
 						emitter.emit(node, probeMsg);
@@ -211,15 +206,23 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			}
 			//Réception d'un évènement TimeOut
 			else if (ev.equals(TIMEOUT_EVENT)) {
-				for(Iterator<Message> itr = neighbors_msg.iterator(); itr.hasNext(); ) {
-					Message m = itr.next();
-					Integer msg_probe_id = (Integer) m.getContent();
-					if(msg_probe_id != current_probe_id) {
-						itr.remove();
-						neighbors_ids.remove(m.getIdSrc());
+
+				Message m = pending_probes.poll();
+				if(m != null) {
+					Integer nbTimeout = received_probes.get(m.getIdSrc()) - 1;
+					if(nbTimeout == 0) {
+						received_probes.remove(m.getIdSrc());
 						if(neightbor_listener_pid != -1)
 							((NeighborhoodListener)node.getProtocol(neightbor_listener_pid)).lostNeighborDetected(node, m.getIdSrc());
 					}
+					else if(nbTimeout > 0) {
+						received_probes.put(m.getIdSrc(), nbTimeout);
+					}
+					else {
+						System.err.println("nbTimeOut = null should not happen");
+					}
+				} else {
+					System.err.println("pending_probes was empty during timeout, this should not happen");
 				}
 				return;
 			}
@@ -229,22 +232,24 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			if(msg.getIdDest() == node.getID()) {
 				// Réception d'un Probe
 				if (msg.getTag().equals(MSG_TAG_PROBE)) {
-					Integer msg_probe_id = (Integer) msg.getContent();
-					if (msg_probe_id == current_probe_id) {
-						if (!neighbors_ids.contains(msg.getIdSrc())) {
-							neighbors_msg.add(msg);
-							neighbors_ids.add(msg.getIdSrc());
-							if (neightbor_listener_pid != -1)
-								((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
-						}
+
+					pending_probes.offer(msg);
+					Integer nbTimeout = received_probes.get(msg.getIdSrc());
+					if(nbTimeout == null) {
+						received_probes.put(msg.getIdSrc(), 1);
+						if (neightbor_listener_pid != -1)
+							((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
+					} else {
+						received_probes.put(msg.getIdSrc(), nbTimeout + 1);
 					}
+
 					// Armer le prochain TimeOut
 					EDSimulator.add(timeout, TIMEOUT_EVENT, node, my_pid);
 				}
 			}
 			return;
 		}
-		System.out.println("Received unknown event: " + event);
+		System.err.println("Received unknown event: " + event);
 		throw new RuntimeException("Receive unknown Event");
 	}
 
@@ -278,30 +283,30 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 | portée | SPI | SD | D(t) | \frac{E(t)}{D(T)} | \frac{ED(t)}{D(T)} |
 |--------|-----|----|------|-------------------|--------------------|
-|     125|    1|   1|  0.63|               9.08|                0.27|
-|     250|    1|   1|  2.24|               5.54|                0.18|
-|     375|    1|   1|  4.59|               4.47|                0.17|
-|     500|    1|   1|  7.26|               3.92|                0.14|
-|     625|    1|   1| 10.73|               3.59|                0.16|
-|     750|    1|   1| 13.31|               3.26|                0.15|
-|     875|    1|   1| 16.03|               2.90|                0.10|
-|    1000|    1|   1| 18.71|               2.56|                0.11|
+|     125|    1|   1|  0,97|               7,18|                0,22|
+|     250|    1|   1|  3,63|               3,70|                0,10|
+|     375|    1|   1|  7,66|               2,85|                0,10|
+|     500|    1|   1| 13,32|               2,51|                0,08|
+|     625|    1|   1| 18,51|               2,38|                0,07|
+|     750|    1|   1| 25,87|               2,18|                0,07|
+|     875|    1|   1| 30,55|               1,92|                0,07|
+|    1000|    1|   1| 35,29|               1,60|                0,04|
 |        |     |    |      |                   |                    |
-|     125|    3|   3| 16.30|               3.10|                0.15|
-|     250|    3|   3| 14.73|               3.16|                0.14|
-|     375|    3|   3| 13.61|               3.28|                0.15|
-|     500|    3|   3| 13.61|               3.29|                0.13|
-|     625|    3|   3| 13.60|               3.20|                0.12|
-|     750|    3|   3| 13.59|               3.18|                0.11|
-|     875|    3|   3| 13.79|               3.20|                0.11|
-|    1000|    3|   3| 13.52|               3.25|                0.13|
+|     125|    3|   3| 30,10|               1,89|                0,07|
+|     250|    3|   3| 27,22|               2,05|                0,07|
+|     375|    3|   3| 26,19|               2,15|                0,09|
+|     500|    3|   3| 25,83|               2,16|                0,08|
+|     625|    3|   3| 26,34|               2,22|                0,09|
+|     750|    3|   3| 25,22|               2,12|                0,10|
+|     875|    3|   3| 25,36|               2,15|                0,10|
+|    1000|    3|   3| 25,59|               2,14|                0,09|
 
 ## Question 11
 
 - Stratégie 1:
-  La taille de la zone étant fixe, l'augmentation de la portée est donc directement proportionnelle avec celui de la densité.
+  La taille de la zone étant fixe, l'augmentation de la portée est donc directement proportionnelle avec celle de la densité.
 - Stratégie 2:
-  La taille de la zone de déplacements augmente proportionnelement avec le scope, la densité reste donc constante avec l'augmentation de la portée.
+  La taille de la zone de déplacement augmente proportionnellement avec le scope, la densité reste donc constante avec l'augmentation de la portée.
   
   
 # exercice 2
