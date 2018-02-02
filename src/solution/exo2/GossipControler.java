@@ -45,7 +45,7 @@ public class GossipControler implements Control{
 		double res;
 		double recv = currRecv;
 		double send = currSend;
-		res = (recv - send)/ recv;
+		res = (recv - send)/ recv*100;
 		totalER+= res;
 		er_trace.add(res);
 	}
@@ -112,7 +112,6 @@ public class GossipControler implements Control{
 			currRecv += (eg.getRecv() == 0) ? 0: 1;
 			currSend += (eg.getSend() == 0) ? 0: 1;
 		}
-//				System.out.println("total: " + totalsend + "/"+ totalrecv +"\n");
 		return (totalsend == 0) || (totalsend+1 == totalrecv);
 	}
 
