@@ -67,4 +67,10 @@ public abstract class EmitterGossip extends EmitterImpl {
 	public int getSend() {
 		return sendGossip;
 	}
+
+	//emit without counting the emitter node as a previous receiver
+	public void emitSpontaneous(Node host, Message msg) {
+		emit(host, msg, true);
+		recvGossip-=1;
+	}
 }

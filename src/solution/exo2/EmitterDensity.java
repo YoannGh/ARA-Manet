@@ -6,7 +6,7 @@ import peersim.core.CommonState;
 import peersim.core.Node;
 import solution.exo1.NeighborProtocolImpl;
 
-public class EmitterDensity extends EmitterGossip{
+public class EmitterDensity extends NotProbabilistEmitter{
 
 	private static final String PAR_K = "k";
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
@@ -35,6 +35,6 @@ public class EmitterDensity extends EmitterGossip{
 		}
 		else {
 			super.emit(host, msg);
-		}		
+		}
 	}
 }

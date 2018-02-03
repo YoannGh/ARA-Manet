@@ -8,7 +8,7 @@ import peersim.core.CommonState;
 import peersim.core.Network;
 import peersim.core.Node;
 
-public class EmitterDistance extends EmitterGossip{
+public class EmitterDistance extends NotProbabilistEmitter{
 
 	private static final String PAR_GOSSIP_IMPL ="gossipprotocol";
 

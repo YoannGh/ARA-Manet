@@ -30,7 +30,7 @@ public class DensityControler implements Control{
 	public DensityControler(String prefix) {
 		this.neighbor_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
 		this.period = Configuration.getInt(prefix+"."+"step");
-		this.range=Configuration.getPid(prefix+"."+PAR_EMITTERPID, -1);
+		this.range = Configuration.getPid(prefix+"."+PAR_EMITTERPID, -1);
 		if(this.range != -1) {
 			Emitter emitter = (Emitter) Network.get(0).getProtocol(emitter_pid);
 			this.range = emitter.getScope();
