@@ -6,20 +6,20 @@ import peersim.core.CommonState;
 import peersim.core.Node;
 import solution.exo1.NeighborProtocolImpl;
 
-public class EmitterDensity extends NotProbabilistEmitter{
+public class EmitterDensity extends NotProbabilistEmitter {
 
 	private static final String PAR_K = "k";
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
 
 	private static final String MSG_TAG_GOSSIP = "gossip";
 
-	private static double k;
-	private static int neighbor_pid;
+	private double k;
+	private int neighbor_pid;
 
 	public EmitterDensity(String prefix) {
 		super(prefix);
-		EmitterDensity.k=Configuration.getDouble(prefix+"."+PAR_K);
-		EmitterDensity.neighbor_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
+		this.k = Configuration.getDouble(prefix+"."+PAR_K);
+		this.neighbor_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
 	}
 
 	//Probability algorithm send according to actual density
@@ -36,5 +36,13 @@ public class EmitterDensity extends NotProbabilistEmitter{
 		else {
 			super.emit(host, msg);
 		}
+	}
+
+	public Object clone() {
+		EmitterDensity res = null;
+		res = (EmitterDensity) super.clone();
+		res.k = k;
+		res.neighbor_pid = neighbor_pid;
+		return res;
 	}
 }

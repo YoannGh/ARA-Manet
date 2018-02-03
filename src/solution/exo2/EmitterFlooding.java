@@ -13,4 +13,8 @@ public class EmitterFlooding extends EmitterGossip{
 	public void emit(Node host, Message msg) {
 		super.emit(host, msg, true);
 	}
+
+	public Object clone() {
+		return super.clone();
+	}
 }

@@ -19,7 +19,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 	private static final String MSG_TAG_TIMER = "timer";
 
 	private final int my_pid;
-	private final int emitter_pid;
+	private int emitter_pid;
 	private long sender = -1;
 	private int broadcastId = 0;
 
@@ -39,7 +39,6 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 			eg.reset();
 			sender = -1;
 		}
-
 
 		Message gossipMsg = new Message(id_initiator, -1, MSG_TAG_GOSSIP, MSG_TAG_GOSSIP, my_pid);
 		EmitterGossip emitter = (EmitterGossip) node.getProtocol(emitter_pid);
@@ -83,9 +82,12 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 	}
 
 	public Object clone(){
-		GossipProtocolImpl res=null;
+		GossipProtocolImpl res = null;
 		try {
-			res=(GossipProtocolImpl)super.clone();
+			res = (GossipProtocolImpl) super.clone();
+			res.emitter_pid = emitter_pid;
+			res.sender = sender;
+			res.broadcastId = broadcastId;
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}

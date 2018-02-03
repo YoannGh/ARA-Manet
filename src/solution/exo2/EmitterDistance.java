@@ -12,11 +12,11 @@ public class EmitterDistance extends NotProbabilistEmitter{
 
 	private static final String PAR_GOSSIP_IMPL ="gossipprotocol";
 
-	private static int gossipprotocol_pid;
+	private int gossipprotocol_pid;
 
 	public EmitterDistance(String prefix) {
 		super(prefix);
-		EmitterDistance.gossipprotocol_pid=Configuration.getPid(prefix+"."+PAR_GOSSIP_IMPL);
+		this.gossipprotocol_pid = Configuration.getPid(prefix+"."+PAR_GOSSIP_IMPL);
 	}
 
 	private double distance(Node a, Node b) {
@@ -41,5 +41,12 @@ public class EmitterDistance extends NotProbabilistEmitter{
 			p = (CommonState.r.nextDouble() < distance(host, Network.get((int) idSender))/scope) ? true:false;
 		}
 		super.emit(host, msg, p);
+	}
+
+	public Object clone() {
+		EmitterDistance res = null;
+		res = (EmitterDistance) super.clone();
+		res.gossipprotocol_pid = gossipprotocol_pid;
+		return res;
 	}
 }

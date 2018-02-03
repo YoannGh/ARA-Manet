@@ -1,6 +1,7 @@
 package solution.exo2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import manet.algorithm.gossip.GossipProtocol;
 import peersim.config.Configuration;
@@ -16,22 +17,24 @@ public class GossipControler implements Control{
 	private static final String PAR_EMITTER ="emitter";
 	private static final String PAR_N ="N";
 
-	private static int gossip_pid;
-	private static int emitter_pid;
-	private static int N;
+	private int gossip_pid;
+	private int emitter_pid;
+	private int N;
 
 	private int currBroadcast = 0;
 	private int totalAtt = 0;
 	private int totalER = 0;
 	private int currRecv = 0;
 	private int currSend = 0;
-	private ArrayList<Double> att_trace = new ArrayList<Double>();
-	private ArrayList<Double> er_trace = new ArrayList<Double>();
+	private List<Double> att_trace;
+	private List<Double> er_trace;
 
 	public GossipControler(String prefix) {
-		GossipControler.N = Configuration.getInt(prefix+"."+PAR_N);
-		GossipControler.emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTER);
-		GossipControler.gossip_pid=Configuration.getPid(prefix+"."+PAR_GOSSIPPID);
+		this.N = Configuration.getInt(prefix+"."+PAR_N);
+		this.emitter_pid = Configuration.getPid(prefix+"."+PAR_EMITTER);
+		this.gossip_pid = Configuration.getPid(prefix+"."+PAR_GOSSIPPID);
+		att_trace = new ArrayList<>();
+		er_trace = new ArrayList<>();
 	}
 
 	public void processAtt() {
@@ -115,10 +118,21 @@ public class GossipControler implements Control{
 	}
 
 	public Object clone(){
-		DensityControler res=null;
+		GossipControler res=null;
 		try {
-			res=(DensityControler)super.clone();
+			res = (GossipControler) super.clone();
+			res.gossip_pid = gossip_pid;
+			res.emitter_pid = emitter_pid;
+			res.N = N;
+			res.currBroadcast = currBroadcast;
+			res.totalAtt = totalAtt;
+			res.totalER = totalER;
+			res.currRecv = currRecv;
+			res.currSend = currSend;
+			res.att_trace = new ArrayList<>(att_trace);
+			res.er_trace = new ArrayList<>(er_trace);
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
+
 }

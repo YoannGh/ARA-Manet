@@ -1,6 +1,7 @@
 package solution.exo1;
 
 import manet.Message;
+import manet.communication.Emitter;
 import manet.detection.NeighborProtocol;
 import manet.detection.NeighborhoodListener;
 import peersim.config.Configuration;
@@ -72,15 +73,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			String ev = (String) event;
 			if(ev.equals(DO_HEARTBEAT_EVENT)) {
 
-				for(int i = 0; i < Network.size(); i++) {
-					Node dest = Network.get(i);
-					if(dest.getID() != node.getID()) {
-						Message probeMsg = new Message(node.getIndex(), dest.getIndex(), MSG_TAG_PROBE, null, my_pid);
-						EmitterImpl emitter = (EmitterImpl) node.getProtocol(emitter_pid);
-						//Envoi du Probe
-						emitter.emit(node, probeMsg);
-					}
-				}
+				Message probeMsg = new Message(node.getID(), Emitter.ALL, MSG_TAG_PROBE, null, my_pid);
+				EmitterImpl emitter = (EmitterImpl) node.getProtocol(emitter_pid);
+				//Envoi du Probe
+				emitter.emit(node, probeMsg);
 				//Armer l'envoi du prochain Probe
 				EDSimulator.add(probe_period, DO_HEARTBEAT_EVENT, node, my_pid);
 				return;

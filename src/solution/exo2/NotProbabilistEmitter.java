@@ -1,5 +1,6 @@
 package solution.exo2;
 
+import java.util.AbstractSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -11,7 +12,7 @@ import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 import solution.exo1.NeighborProtocolImpl;
 
-public abstract class NotProbabilistEmitter extends EmitterGossip{
+public abstract class NotProbabilistEmitter extends EmitterGossip {
 
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
 	private static final String PAR_GOSSIPPID ="gossipprotocol";
@@ -22,23 +23,23 @@ public abstract class NotProbabilistEmitter extends EmitterGossip{
 	private static final String MSG_TAG_GOSSIP = "gossip";
 	private static final String MSG_TAG_TIMER = "timer";
 
-	private static boolean activate;
-	private static int neighbor_pid;
-	private static int gossip_pid;
-	private static int timer_min;
-	private static int timer_max;
+	private boolean activate;
+	private int neighbor_pid;
+	private int gossip_pid;
+	private int timer_min;
+	private int timer_max;
 
-	TreeSet<Long> lx;
+	private AbstractSet<Long> lx;
 
 	public NotProbabilistEmitter(String prefix) {
 		super(prefix);
-		NotProbabilistEmitter.activate=Configuration.getBoolean(prefix+"."+PAR_ACTIVATE);
+		this.activate = Configuration.getBoolean(prefix+"."+PAR_ACTIVATE);
 
 		if(activate) {
-			NotProbabilistEmitter.neighbor_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
-			NotProbabilistEmitter.gossip_pid=Configuration.getPid(prefix+"."+PAR_GOSSIPPID);
-			NotProbabilistEmitter.timer_min=Configuration.getInt(prefix+"."+PAR_TIMERMIN);
-			NotProbabilistEmitter.timer_max=Configuration.getInt(prefix+"."+PAR_TIMERMAX);
+			this.neighbor_pid = Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
+			this.gossip_pid = Configuration.getPid(prefix+"."+PAR_GOSSIPPID);
+			this.timer_min = Configuration.getInt(prefix+"."+PAR_TIMERMIN);
+			this.timer_max = Configuration.getInt(prefix+"."+PAR_TIMERMAX);
 			lx = new TreeSet<Long>();
 		}
 	}
@@ -83,7 +84,16 @@ public abstract class NotProbabilistEmitter extends EmitterGossip{
 		}
 	}
 
-	public void emit(Node host, Message msg) {
-		super.emit(host, msg);
+	public Object clone() {
+		NotProbabilistEmitter res = null;
+		res = (NotProbabilistEmitter) super.clone();
+		res.activate = activate;
+		res.neighbor_pid = neighbor_pid;
+		res.gossip_pid = gossip_pid;
+		res.timer_min = timer_min;
+		res.timer_max = timer_max;
+		res.lx = new TreeSet<>(lx);
+		return res;
 	}
+
 }
