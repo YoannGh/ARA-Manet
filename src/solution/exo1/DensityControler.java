@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import manet.communication.Emitter;
 import peersim.config.Configuration;
 
 import peersim.core.Control;
@@ -16,7 +17,9 @@ import peersim.core.Node;
 public class DensityControler implements Control{
 
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
+	private static final String PAR_EMITTERPID ="emitterprotocol";
 
+	private int emitter_pid;
 	private int neighbor_pid;
 	private int period;
 	private int range;
@@ -27,7 +30,11 @@ public class DensityControler implements Control{
 	public DensityControler(String prefix) {
 		this.neighbor_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
 		this.period = Configuration.getInt(prefix+"."+"step");
-		this.range = Configuration.getInt(prefix+"."+"range", -1);
+		this.range=Configuration.getPid(prefix+"."+PAR_EMITTERPID, -1);
+		if(this.range != -1) {
+			Emitter emitter = (Emitter) Network.get(0).getProtocol(emitter_pid);
+			this.range = emitter.getScope();
+		}
 	}
 
 	// Di(t)
@@ -82,7 +89,7 @@ public class DensityControler implements Control{
 		avgNei();
 		standardVariation();
 		NumberFormat formatter = new DecimalFormat("#0.00");
-		
+
 		System.out.println(formatter.format((double)CommonState.getTime() * 100 / CommonState.getEndTime()) + "%");
 
 		// A la dernière exécution du DensityControler on affiche les résultats calculés
