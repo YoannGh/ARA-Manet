@@ -85,8 +85,7 @@ public class GossipControler implements Control{
 				currBroadcast+=1;
 				return false;
 			}
-
-			if(currBroadcast == N) {
+			else if(currBroadcast == N) {
 				System.out.println("Avgatt = " + totalAtt/att_trace.size()+ "%");
 				System.out.println("Avger = " + totalER/er_trace.size()+ "%");
 				System.out.println("Eatt = " + standardVariationAtt());
