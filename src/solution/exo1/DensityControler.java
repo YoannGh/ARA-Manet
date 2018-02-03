@@ -3,6 +3,7 @@ package solution.exo1;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import peersim.config.Configuration;
 
@@ -16,12 +17,12 @@ public class DensityControler implements Control{
 
 	private static final String PAR_NEIGHBORPID ="neighborprotocol";
 
-	private final int neighbor_pid;
-	private final int period;
-	private final int range;
+	private int neighbor_pid;
+	private int period;
+	private int range;
 	private double totalAvgNei = 0;
 	private double totalStandVar = 0;
-	private ArrayList<Double> avg_trace = new ArrayList<Double>();
+	private List<Double> avg_trace = new ArrayList<Double>();
 
 	public DensityControler(String prefix) {
 		this.neighbor_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBORPID);
@@ -29,6 +30,7 @@ public class DensityControler implements Control{
 		this.range = Configuration.getInt(prefix+"."+"range", -1);
 	}
 
+	// Di(t)
 	private double avgNei() {
 		double avg = 0;
 		for(int i = 0 ; i< Network.size() ; i++){
@@ -42,10 +44,7 @@ public class DensityControler implements Control{
 		return avg;
 	}
 
-	private double avgNeiSinceStartup() {
-		return totalAvgNei/avg_trace.size();
-	}
-
+	// Ei(t)
 	private void standardVariation() {
 		double avg = avg_trace.get(avg_trace.size()-1)/avg_trace.size();
 		double sv = 0;
@@ -58,10 +57,17 @@ public class DensityControler implements Control{
 		totalStandVar += Math.sqrt(sv);
 	}
 
+	// D(t)
+	private double avgNeiSinceStartup() {
+		return totalAvgNei/avg_trace.size();
+	}
+
+	// E(t)
 	private double avgStandVarSinceStartup() {
 		return totalStandVar/avg_trace.size();
 	}
 
+	// ED(t)
 	private double ED(){
 		double value = 0;
 		for(double i : avg_trace){
@@ -79,15 +85,13 @@ public class DensityControler implements Control{
 		
 		System.out.println(formatter.format((double)CommonState.getTime() * 100 / CommonState.getEndTime()) + "%");
 
+		// A la dernière exécution du DensityControler on affiche les résultats calculés
 		if(CommonState.getTime() >= (CommonState.getEndTime() - period)) {
 			double dt = avgNeiSinceStartup();
+			System.out.println("Portée: " + range);
 			System.out.println("D(t): " + formatter.format(dt));
 			System.out.println("E(t)/D(t): " + formatter.format((avgStandVarSinceStartup() / dt)));
 			System.out.println("ED(t)/D(t): " + formatter.format((ED() / dt)));
-//			System.out.println("|     " + range + "|    3|   3| " + formatter.format(dt) + "|               " +
-//								formatter.format((avgStandVarSinceStartup() / dt))	+ "|                " +
-//								formatter.format((ED() / dt)) + "|");
-			System.out.println("|                " + range + "|  " + formatter.format(dt) + "|               " + formatter.format((ED() / dt)) + "|");
 		}
 		return false;
 	}
@@ -96,6 +100,12 @@ public class DensityControler implements Control{
 		DensityControler res=null;
 		try {
 			res=(DensityControler)super.clone();
+			res.neighbor_pid = neighbor_pid;
+			res.period = period;
+			res.range = range;
+			res.totalAvgNei = totalAvgNei;
+			res.totalStandVar = totalStandVar;
+			res.avg_trace = new ArrayList<>(avg_trace);
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
