@@ -34,17 +34,15 @@ public class EmitterImpl implements Emitter {
 		PositionProtocol ppEmitter = (PositionProtocol) host.getProtocol(positionprotocol_pid);
 		Position positionEmitter = ppEmitter.getCurrentPosition();
 
-		for(int i = 0; i < Network.size(); i++) {
-			Node n = Network.get(i);
-			if(n.getID() != host.getID()) {
-				PositionProtocol ppNode = (PositionProtocol) n.getProtocol(positionprotocol_pid);
-				Position positionNode = ppNode.getCurrentPosition();
-				double distance = Math.hypot(	positionEmitter.getX()-positionNode.getX(),
-												positionEmitter.getY()-positionNode.getY());
+		Node dest = Network.get((int) msg.getIdDest());
+		if(dest.getID() != host.getID()) {
+			PositionProtocol ppDest = (PositionProtocol) dest.getProtocol(positionprotocol_pid);
+			Position positionDest = ppDest.getCurrentPosition();
+			double distance = Math.hypot(	positionEmitter.getX()-positionDest.getX(),
+					positionEmitter.getY()-positionDest.getY());
 
-				if (distance <= scope) {
-					EDSimulator.add(latency, msg, n, msg.getPid());
-				}
+			if (distance <= scope) {
+				EDSimulator.add(latency, msg, dest, msg.getPid());
 			}
 		}
 	}

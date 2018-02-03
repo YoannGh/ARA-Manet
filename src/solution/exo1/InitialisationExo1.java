@@ -9,12 +9,12 @@ import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 
-public class Initialisation implements Control {
+public class InitialisationExo1 implements Control {
 
 	private static final String pp_PID = "positionprotocolimpl";
 	private static final String np_PID = "neighborprotocolimpl";
 
-	public  Initialisation(String prefix) {}
+	public InitialisationExo1(String prefix) {}
 
 	@Override
 	public boolean execute() {

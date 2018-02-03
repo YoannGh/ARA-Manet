@@ -9,7 +9,7 @@ import peersim.core.Node;
 import peersim.edsim.EDSimulator;
 import solution.exo1.EmitterImpl;
 
-public abstract class EmitterGossip extends EmitterImpl{
+public abstract class EmitterGossip extends EmitterImpl {
 	int recvGossip;
 	int sendGossip;
 

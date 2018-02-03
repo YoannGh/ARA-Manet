@@ -75,7 +75,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 				for(int i = 0; i < Network.size(); i++) {
 					Node dest = Network.get(i);
 					if(dest.getID() != node.getID()) {
-						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, null, my_pid);
+						Message probeMsg = new Message(node.getIndex(), dest.getIndex(), MSG_TAG_PROBE, null, my_pid);
 						EmitterImpl emitter = (EmitterImpl) node.getProtocol(emitter_pid);
 						//Envoi du Probe
 						emitter.emit(node, probeMsg);
