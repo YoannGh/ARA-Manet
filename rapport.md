@@ -587,3 +587,28 @@ et en utilisant un algorithme probabiliste basé sur la distance émetteur-réce
 |               160|               100|               15|            0,00|           6,68|
 |               180|               100|               15|            0,00|           6,60|
 |               200|               100|               15|            0,00|           6,64|
+
+
+## Question 8
+
+#### Algorithme 4 version non probabiliste (mécanisme de rediffusion)
+
+Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
+et en utilisant un algorithme basé sur la distance émetteur-récepteur avec mécanisme de rediffusion.
+
+| Taille du réseau | Att500 Moyen (%) | ER500 Moyen (%) | Ecart-type Att | Ecart-type ER |
+|------------------|------------------|-----------------|----------------|---------------|
+|                20|               100|               32|            0,00|          10,45|
+|                30|                98|               33|           14,00|           8,63|
+|                40|               100|               34|            0,00|           8,27|
+|                50|               100|               34|            0,00|           7,68|
+|                60|               100|               33|            0,00|           6,67|
+|                70|               100|               32|            0,00|           6,11|
+|                80|               100|               33|            0,00|           6,46|
+|                90|               100|               31|            0,00|           6,03|
+|               100|               100|               32|            0,00|           5,66|
+|               120|               100|               31|            0,00|           5,33|
+|               140|               100|               31|            0,00|           4,79|
+|               160|               100|               30|            0,00|           5,02|
+|               180|               100|               29|            0,00|           4,91|
+|               200|               100|               29|            0,00|           4,46|
