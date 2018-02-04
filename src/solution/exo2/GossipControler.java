@@ -1,11 +1,5 @@
 package solution.exo2;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +9,12 @@ import peersim.core.CommonState;
 import peersim.core.Control;
 import peersim.core.Network;
 import peersim.core.Node;
-import solution.exo1.DensityControler;
 
 public class GossipControler implements Control{
 
 	private static final String PAR_GOSSIPPID ="gossipprotocol";
 	private static final String PAR_EMITTER ="emitter";
 	private static final String PAR_N ="N";
-
-	private static NumberFormat formatter = new DecimalFormat("#0.00");
 
 	private int gossip_pid;
 	private int emitter_pid;
@@ -102,14 +93,6 @@ public class GossipControler implements Control{
 				System.out.println("Avger = " + totalER/er_trace.size()+ "%");
 				System.out.println("Eatt = " + standardVariationAtt());
 				System.out.println("Eer = " + standardVariationER());
-				String tmp = "\n|                "+ Network.size() +"|                5 |               " +
-						totalAtt/att_trace.size() +"|               " + totalER/er_trace.size() + "|";
-				try {
-					Files.write(Paths.get("myfile.txt"), tmp.getBytes(), StandardOpenOption.APPEND);
-				}catch (IOException e) {
-				    System.out.println("failed open log file");
-				}
-				
 				System.exit(0);
 			}
 		}

@@ -5,7 +5,6 @@ import manet.communication.Emitter;
 import manet.detection.NeighborProtocol;
 import manet.detection.NeighborhoodListener;
 import peersim.config.Configuration;
-import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 import peersim.edsim.EDSimulator;
@@ -117,7 +116,6 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 					} else {
 						received_probes.put(msg.getIdSrc(), nbTimeout + 1);
 					}
-
 					// Armer le prochain TimeOut
 					EDSimulator.add(timeout, TIMEOUT_EVENT, node, my_pid);
 				}

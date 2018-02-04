@@ -40,7 +40,7 @@ public abstract class NotProbabilistEmitter extends EmitterGossip {
 			this.gossip_pid = Configuration.getPid(prefix+"."+PAR_GOSSIPPID);
 			this.timer_min = Configuration.getInt(prefix+"."+PAR_TIMERMIN);
 			this.timer_max = Configuration.getInt(prefix+"."+PAR_TIMERMAX);
-			lx = new TreeSet<Long>();
+			lx = new TreeSet<>();
 		}
 	}
 
