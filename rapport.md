@@ -280,7 +280,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 ## Question 10
 
 
-| portée | SPI | SD | D(t) | \frac{E(t)}{D(T)} | \frac{ED(t)}{D(T)} |
+| portée | SPI | SD | D(t) | E(t) / D(T) | ED(t) / D(T) |
 |--------|-----|----|------|-------------------|--------------------|
 |     125|    1|   1|  1,00|               1,35|                0,18|
 |     250|    1|   1|  3,87|               1,11|                0,12|
@@ -308,7 +308,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
   La taille de la zone de déplacement augmente proportionnellement avec le scope, la densité reste donc constante avec l'augmentation de la portée.
   
   
-# exercice 2
+# Exercice 2
 
 ## Question 1
 
@@ -330,6 +330,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 |               180|  76,97|               0,02|
 |               200|  81,44|               0,02|
 
+![exo2_q1_dt](graphs/exo2_q1_dt.png)
+
+![exo2_q1_eddt](graphs/exo2_q1_eddt.png)
+
 Sans surprise avec une taille du terrain constante, la densité du réseau augmente avec le nombre de noeuds. De même, la variation de la densité diminue avec l'augmentation de la taille du réseau.
 On peut conclure qu'a partir d'un réseau de taille 50, la variation du nombre de voisins reste à peut près constante durant toute la durée d'éxecution du programme.
 
@@ -339,12 +343,18 @@ Pour detecter la terminaison d'un gossip, il suffit de maintenir deux variables 
 
 ## Question 4
 
+![exo2_q4_att](graphs/exo2_q4_att.png)
+
+![exo2_q4_att](graphs/exo2_q4_er.png)
+
 L'atteignabilité est de 100% quelquesoit la taille du réseau, ce résultat est logique vu que l'algorithme de flooding retransmet les messages dans tous les cas et le réseau est connexe durant toute l'execution du programme(garantie par SPI_5 et SD_4) 
 
 ## Question 5
 
-Pour chaque test, l'economie de redifusion correspond à la valeur de probabilité donnée en entrée. 
-Pour les valeures de p supérieures à 0.5, la taille du réseau ne semble pas avoir d'impacts sur les résultats, en revanche, pour un p inférieurs, on note une nette amélioration de l'atteignabilité lorsque le réseau dépasse 50, taille a partir de laquelle le nombre de voisins est constant, comme démontré à la question 1.
+![exo2_q5](graphs/exo2_q5.png)
+
+Pour chaque test, l'économie de redifusion correspond à la valeur de probabilité donnée en entrée. 
+Pour les valeurs de p supérieures à 0.5, la taille du réseau ne semble pas avoir d'impacts sur les résultats, en revanche, pour un p inférieurs, on note une nette amélioration de l'atteignabilité lorsque le réseau dépasse 50, taille a partir de laquelle le nombre de voisins est constant, comme démontré à la question 1.
 
 
 ## Question 6
@@ -353,6 +363,26 @@ Afin de maximiser à la fois Att et Er, il semble logique que la probabilité do
 
 Évolution de l'atteignabilité en fonction de la densité du réseau et d'une probabilité inversement
  proportionnelle à la densité.
+ 
+ 
+![exo2_q6_k1](graphs/exo2_q6_k1.png)
+
+---
+ 
+![exo2_q6_k2](graphs/exo2_q6_k2.png)
+
+---
+  
+![exo2_q6_k3](graphs/exo2_q6_k3.png)
+
+---
+   
+![exo2_q6_k4](graphs/exo2_q6_k4.png)
+
+---
+
+![exo2_q6_k5](graphs/exo2_q6_k5.png)
+
 
 ## Question 7
 
@@ -377,6 +407,9 @@ et en utilisant un algorithme probabiliste basé sur la distance émetteur-réce
 |               160|               100|               15|            0,00|           6,68|
 |               180|               100|               15|            0,00|           6,60|
 |               200|               100|               15|            0,00|           6,64|
+
+
+![exo2_q7](graphs/exo2_q7.png)
 
 
 ## Question 8
@@ -459,6 +492,26 @@ et en utilisant un algorithme basé sur la densité locale avec mécanisme de re
 |               180|   5 |                53|               86|
 |               200|   5 |                54|               87|
 
+
+![exo2_q8_algo3_k1](graphs/exo2_q8_algo3_k1.png)
+
+---
+ 
+![exo2_q8_algo3_k2](graphs/exo2_q8_algo3_k2.png)
+
+---
+  
+![exo2_q8_algo3_k3](graphs/exo2_q8_algo3_k3.png)
+
+---
+   
+![exo2_q8_algo3_k4](graphs/exo2_q8_algo3_k4.png)
+
+---
+
+![exo2_q8_algo3_k5](graphs/exo2_q8_algo3_k5.png)
+
+
 #### Algorithme 4 version non probabiliste (mécanisme de rediffusion)
 
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
@@ -480,3 +533,6 @@ et en utilisant un algorithme basé sur la distance émetteur-récepteur avec m�
 |               160|               100|               30|            0,00|           5,02|
 |               180|               100|               29|            0,00|           4,91|
 |               200|               100|               29|            0,00|           4,46|
+
+
+![exo2_q8_algo4](graphs/exo2_q8_algo4.png)
