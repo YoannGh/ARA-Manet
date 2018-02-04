@@ -22,7 +22,7 @@ Pour chaque question du devoir ou des benchs sont demandés, il est possible de 
 > make exAqB
 ou 'A' est le numéro de l'exercice et 'B' le numero de la question.
 
-Voici la liste exaustive des exemples executions possible:
+Voici la liste exhaustive des exemples d'executions possible:
 > make ex1q10
 > make ex2q1
 > make ex2q4
