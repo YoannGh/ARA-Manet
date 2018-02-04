@@ -2,7 +2,7 @@
 
 
 Étudiants:
-- Nicolas Guittonneau ()
+- Nicolas Guittonneau (3604340)
 - Yoann Ghigoff (3506454)
 
 
@@ -190,7 +190,7 @@ Pour les valeurs de p supérieures à 0.5, la taille du réseau ne semble pas av
 
 _Courbes: Voir figures 6 à 10_
 
-Afin de maximiser à la fois Att et Er, il semble logique que la probabilité doit être inversement proportionelle à la taille du voisinage, en effet, si la densité est importante, la probabilité qu'un voisin ai reçu le message en même temps que moi est plus élevée. On remarque sur les graphiques que les meilleurs résultats sont dans la fourchette d'une taille de réseau de 40-70 noeuds. Pour des réseaux plus petits, l'atteignabilité est trop faible, dû au fait qu'il n'y ai pas assez de voisins, et pour les réseaux plus grand la rediffusion est trop élévée, dû à la densité trop élévée.
+Afin de maximiser à la fois Att et Er, il semble logique que la probabilité doit être inversement proportionelle à la taille du voisinage, en effet, si la densité est importante, la probabilité qu'un voisin ai reçu le message en même temps que moi même est plus élevée. On remarque sur les graphiques que les meilleurs résultats sont dans la fourchette d'une taille de réseau de 40-70 noeuds. Pour des réseaux plus petits, l'atteignabilité est trop faible, dû au fait qu'il n'y ai pas assez de voisins, et pour les réseaux plus grand la rediffusion est trop élévée, dû à la densité trop élévée.
 
 #### Question 7
 
@@ -326,7 +326,12 @@ et en utilisant un algorithme basé sur la distance émetteur-récepteur avec m�
 
 _Courbe: Voir figure 17_
 
+Pour les deux algorithmes, l'economie de rediffusion à fortement augmenté sans avoir de conséquences négatives sur l'atteignabilité, en effet un gain d'environs respectivement 25% et 15% sur les algorithmes 3 et 4 est visible sur les graphiques. 
+
 #### Question 9
+
+Si l'atteignabilité est la priorité, quelquesoit la taille du réseaux, c'est l'algorithme 4 avec l'approche non probabiliste qu'il faut choisir.
+Si en revanche vous souhaitez maximiser les deux, pour un réseaux supérieur à 80 noeuds, il faut choisir 3 de densité locale, sinon encore une fois, l'algorithme 4 qui retransmet suivant la distance des voisins est le meilleur. 
 
 ### Figures
 
