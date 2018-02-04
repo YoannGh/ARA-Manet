@@ -92,7 +92,9 @@ public abstract class NotProbabilistEmitter extends EmitterGossip {
 		res.gossip_pid = gossip_pid;
 		res.timer_min = timer_min;
 		res.timer_max = timer_max;
-		res.lx = new TreeSet<>(lx);
+		if(activate) {
+			res.lx = new TreeSet<>(lx);
+		}
 		return res;
 	}
 

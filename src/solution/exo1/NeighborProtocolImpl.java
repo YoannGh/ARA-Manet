@@ -72,9 +72,8 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		if(event instanceof String) {
 			String ev = (String) event;
 			if(ev.equals(DO_HEARTBEAT_EVENT)) {
-
 				Message probeMsg = new Message(node.getID(), Emitter.ALL, MSG_TAG_PROBE, null, my_pid);
-				EmitterImpl emitter = (EmitterImpl) node.getProtocol(emitter_pid);
+				Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
 				//Envoi du Probe
 				emitter.emit(node, probeMsg);
 				//Armer l'envoi du prochain Probe
@@ -106,10 +105,9 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 		}
 		else if(event instanceof Message) {
 			Message msg = (Message) event;
-			if(msg.getIdDest() == node.getID()) {
+			if(msg.getIdDest() == node.getID() || msg.getIdDest() == Emitter.ALL) {
 				// Réception d'un Probe
 				if (msg.getTag().equals(MSG_TAG_PROBE)) {
-
 					pending_probes.offer(msg);
 					Integer nbTimeout = received_probes.get(msg.getIdSrc());
 					if(nbTimeout == null) {
