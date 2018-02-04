@@ -30,7 +30,7 @@ public class EmitterDensity extends NotProbabilistEmitter {
 			NeighborProtocolImpl npi = (NeighborProtocolImpl) host.getProtocol(neighbor_pid);
 			V = npi.getNeighbors().size();
 			//p = CommonState.r.nextDouble() < k*V;
-			p = (CommonState.r.nextDouble() < k/V) ? true:false;
+			p = (CommonState.r.nextDouble() < k/V);
 			super.emit(host, msg, p);		
 		}
 		else {
