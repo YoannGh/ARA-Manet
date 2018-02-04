@@ -565,3 +565,25 @@ un algorithme probabiliste.
 |               160|    5|                30|               90|
 |               180|    5|                26|               91|
 |               200|    5|                25|               92|
+
+## Question 7
+
+Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
+et en utilisant un algorithme probabiliste basé sur la distance émetteur-récepteur.
+
+| Taille du réseau | Att500 Moyen (%) | ER500 Moyen (%) | Ecart-type Att | Ecart-type ER |
+|------------------|------------------|-----------------|----------------|---------------|
+|                20|                98|               19|           11,76|           9,58|
+|                30|               100|               23|            0,00|          10,30|
+|                40|                96|               23|           17,62|           9,74|
+|                50|               100|               21|            0,00|           8,54|
+|                60|               100|               19|            0,00|           7,59|
+|                70|               100|               20|            0,00|           7,69|
+|                80|               100|               18|            0,00|           7,91|
+|                90|               100|               19|            0,00|           7,66|
+|               100|               100|               18|            0,00|           7,27|
+|               120|               100|               17|            0,00|           7,87|
+|               140|               100|               17|            0,00|           6,83|
+|               160|               100|               15|            0,00|           6,68|
+|               180|               100|               15|            0,00|           6,60|
+|               200|               100|               15|            0,00|           6,64|

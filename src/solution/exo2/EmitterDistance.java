@@ -38,7 +38,7 @@ public class EmitterDistance extends NotProbabilistEmitter{
 			p = true;
 		}
 		else {
-			p = (CommonState.r.nextDouble() < distance(host, Network.get((int) idSender))/scope) ? true:false;
+			p = scope > 0 ? (CommonState.r.nextDouble() < distance(host, Network.get((int) idSender))/scope) : false;
 		}
 		super.emit(host, msg, p);
 	}

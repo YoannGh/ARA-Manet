@@ -20,16 +20,16 @@ public class InitialisationExo2 implements Control {
     @Override
     public boolean execute() {
         int positionprotocol_pid = Configuration.lookupPid(pp_PID);
-        int neighborprotocol_pid = Configuration.lookupPid(np_PID);
+        //int neighborprotocol_pid = Configuration.lookupPid(np_PID);
         for(int i = 0; i < Network.size(); i++) {
             Node n = Network.get(i);
             PositionProtocol pp = (PositionProtocol) n.getProtocol(positionprotocol_pid);
-            NeighborProtocol np = (NeighborProtocol) n.getProtocol(neighborprotocol_pid);
+            //NeighborProtocol np = (NeighborProtocol) n.getProtocol(neighborprotocol_pid);
             pp.initialiseCurrentPosition(n);
             //Démarrer le déplacement des noeuds
             EDSimulator.add(1, PositionProtocolImpl.loop_event, n, positionprotocol_pid);
             //Démarrer l'envoi des Messages Probe
-            EDSimulator.add(1, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, n, neighborprotocol_pid);
+            //EDSimulator.add(1, NeighborProtocolImpl.DO_HEARTBEAT_EVENT, n, neighborprotocol_pid);
         }
         return false;
     }
