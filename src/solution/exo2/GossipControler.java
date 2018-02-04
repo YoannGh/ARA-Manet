@@ -105,7 +105,7 @@ public class GossipControler implements Control{
 				    System.out.println("failed open log file");
 				}*/
 				
-				System.exit(1);
+				System.exit(0);
 			}
 		}
 

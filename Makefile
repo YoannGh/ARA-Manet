@@ -8,6 +8,7 @@ SRC_DIR=$(ROOT_DIR)/src
 OUT_DIR=$(ROOT_DIR)/out
 MANIFEST_DIR=$(ROOT_DIR)/META-INF
 BUILD_DIR=$(ROOT_DIR)/build
+CFG_DIR=$(ROOT_DIR)/cfg
 
 SRCS=$(shell find $(SRC_DIR) -name '*.java')
 
@@ -40,3 +41,27 @@ jar: classes move-manifest build_dir
 clean:
 	rm -rf $(OUT_DIR)
 	rm -rf $(BUILD_DIR)
+
+ex1q10 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q1 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q4 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q5 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q6 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q7 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q8_1 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
+
+ex2q8_2 :
+	@make && java -jar build/$(BUILD_JAR_NAME) $(CFG_DIR)/$@.cfg
