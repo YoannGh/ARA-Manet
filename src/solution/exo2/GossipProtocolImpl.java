@@ -7,8 +7,6 @@ import peersim.core.Network;
 import peersim.core.Node;
 import peersim.edsim.EDProtocol;
 
-import org.lsmp.djep.groupJep.GOperatorSet;
-
 import manet.Message;
 
 public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
