@@ -42,7 +42,7 @@ public class GossipProtocolImpl implements GossipProtocol, EDProtocol{
 
 		Message gossipMsg = new Message(id_initiator, -1, MSG_TAG_GOSSIP, MSG_TAG_GOSSIP, my_pid);
 		EmitterGossip emitter = (EmitterGossip) node.getProtocol(emitter_pid);
-		emitter.emit(node, gossipMsg);
+		emitter.emitSpontaneous(node, gossipMsg);
 	}
 
 	@Override

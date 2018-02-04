@@ -13,6 +13,7 @@ public abstract class EmitterGossip extends EmitterImpl {
 
 	private int recvGossip;
 	private int sendGossip;
+	private int spontaneous;
 
 	public EmitterGossip(String prefix) {
 		super(prefix);
@@ -47,17 +48,14 @@ public abstract class EmitterGossip extends EmitterImpl {
 		recvGossip += 1;
 	}
 
-	public boolean broadcastDone() {
-		return (recvGossip == sendGossip || recvGossip == -1);
-	}
-
 	public void reset() {
 		recvGossip = 0;
 		sendGossip = 0;
+		spontaneous = 0;
 	}
 
 	public int getRecv() {
-		return recvGossip;
+		return recvGossip - spontaneous;
 	}
 
 	public int getSend() {
@@ -67,7 +65,7 @@ public abstract class EmitterGossip extends EmitterImpl {
 	//emit without counting the emitter node as a previous receiver
 	public void emitSpontaneous(Node host, Message msg) {
 		emit(host, msg, true);
-		recvGossip-=1;
+		spontaneous+=1;
 	}
 
 	public Object clone() {
@@ -75,6 +73,7 @@ public abstract class EmitterGossip extends EmitterImpl {
 		res = (EmitterGossip) super.clone();
 		res.recvGossip = recvGossip;
 		res.sendGossip = sendGossip;
+		res.spontaneous = spontaneous;
 		return res;
 	}
 }

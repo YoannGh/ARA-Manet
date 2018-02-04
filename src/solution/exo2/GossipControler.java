@@ -114,7 +114,7 @@ public class GossipControler implements Control{
 			currRecv += (eg.getRecv() == 0) ? 0: 1;
 			currSend += (eg.getSend() == 0) ? 0: 1;
 		}
-		return (totalsend == 0) || (totalsend+1 == totalrecv);
+		return ((totalsend == 0) || (totalsend == totalrecv));
 	}
 
 	public Object clone(){
