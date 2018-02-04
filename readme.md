@@ -1,19 +1,19 @@
-#Sources
+# Sources
 Les sources du projet sont dans:
 > src/
 
-Les fichier de configuration peersim se trouvent dans:
+Les fichiers de configuration peersim se trouvent dans:
 > cfg/
 
 Les resultats des benchs sont dans:
 > graph/
 
-#Compilation
+# Compilation
 
 Pour compiler le projet:
 > make
 
-#Execution
+# Execution
 
 Pour executer le projet:
 > java -jar build/ARA-Manet.jar ficherDeConfig.cfg 

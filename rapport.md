@@ -330,6 +330,13 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 |               180|  76,97|               0,02|
 |               200|  81,44|               0,02|
 
+Sans surprise avec une taille du terrain constante, la densité du réseau augmente avec le nombre de noeuds. De même, la variation de la densité diminue avec l'augmentation de la taille du réseau.
+On peut conclure qu'a partir d'un réseau de taille 50, la variation du nombre de voisins reste à peut près constante durant toute la durée d'éxecution du programme.
+
+## Question 2
+
+Pour detecter la terminaison d'un gossip, il suffit de maintenir deux variables représentant le nombre de messages reçus et le nombre de messages envoyés (de type gossip). Lorsque ces deux variable sont identiques, c'est que tous les messages envoyés on été reçu, et qu'il n'y a donc plus de messages en cours de transmition. Le gossip est donc terminé, on peut alors lancer le suivant.
+
 ## Question 4
 
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
@@ -352,7 +359,12 @@ en utilisant un algorithme de flooding.
 |               180|             100,0|              0,0|               0|              0|
 |               200|             100,0|              0,0|               0|              0|
 
+L'atteignabilité est de 100% quelquesoit la taille du réseau, ce résultat est logique vu que l'algorithme de flooding retransmet les messages dans tous les cas et le réseau est connexe durant toute l'execution du programme(garantie par SPI_5 et SD_4) 
+
 ## Question 5
+
+Pour chaque test, l'economie de redifusion correspond à la valeur de probabilité donnée en entrée. 
+Pour les valeures de p supérieures à 0.5, la taille du réseau ne semble pas avoir d'impacts sur les résultats, en revanche, pour un p inférieurs, on note une nette amélioration de l'atteignabilité lorsque le réseau dépasse 50, taille a partir de laquelle le nombre de voisins est constant, comme démontré à la question 1.
 
 Évolution de l'atteignabilité en fonction de la densité du réseau en utilisant 
 un algorithme probabiliste.
@@ -373,6 +385,10 @@ un algorithme probabiliste.
 |               160|            0.2|                71|
 |               180|            0.2|                72|
 |               200|            0.2|                75|
+
+
+
+
 |                20|            0.3|                54|
 |                30|            0.3|                90|
 |                40|            0.3|                46|
@@ -488,6 +504,8 @@ un algorithme probabiliste.
 
 
 ## Question 6
+
+Afin de maximiser à la fois Att et Er, il semble logique que la probabilité doit être inversement proportionelle à la taille du voisinage, en effet, si la densité est importante, la probabilité qu'un voisin ai reçu le message en meme temps que moi est plus élevée. On remarque sur les graphiques que les meilleurs résultats sont dans la fourchette d'une taille de réseau de 40-70 noeuds. Pour des réseaux plus petits, l'atteignabilité est trop faible, due au fait qu'il n'y ai pas assez de voisins, et pour les reseaux plus grand la redifusion est trop élévée, du à la densité trop élévée.
 
 Évolution de l'atteignabilité en fonction de la densité du réseau et d'une probabilité inversement
  proportionnelle à la densité.
