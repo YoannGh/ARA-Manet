@@ -223,6 +223,7 @@ et en utilisant un algorithme probabiliste basé sur la distance émetteur-réce
 
 ##### Algorithme 3 avec mécanisme de rediffusion
 
+
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau
 et en utilisant un algorithme basé sur la densité locale avec mécanisme de rediffusion.
 
@@ -304,6 +305,7 @@ _Courbes: Voir figures 12 à 16_
 
 ##### Algorithme 4 avec mécanisme de rediffusion
 
+
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
 et en utilisant un algorithme basé sur la distance émetteur-récepteur avec mécanisme de rediffusion.
 
@@ -326,12 +328,13 @@ et en utilisant un algorithme basé sur la distance émetteur-récepteur avec m�
 
 _Courbe: Voir figure 17_
 
-Pour les deux algorithmes, l'economie de rediffusion à fortement augmenté sans avoir de conséquences négatives sur l'atteignabilité, en effet un gain d'environs respectivement 25% et 15% sur les algorithmes 3 et 4 est visible sur les graphiques. 
+Pour les deux algorithmes, l'économie de rediffusion a fortement augmenté sans avoir de conséquences négatives sur l'atteignabilité, en effet un gain d'environ respectivement 25% et 15% sur les algorithmes 3 et 4 est visible sur les graphiques. 
 
 #### Question 9
 
-Si l'atteignabilité est la priorité, quelquesoit la taille du réseaux, c'est l'algorithme 4 avec l'approche non probabiliste qu'il faut choisir.
-Si en revanche vous souhaitez maximiser les deux, pour un réseaux supérieur à 80 noeuds, il faut choisir 3 de densité locale, sinon encore une fois, l'algorithme 4 qui retransmet suivant la distance des voisins est le meilleur. 
+Si l'atteignabilité est la priorité, quelque soit la taille du réseau, c'est l'algorithme 4 avec l'approche non probabiliste qu'il faut choisir.
+Si en revanche vous souhaitez maximiser les deux, pour un réseaux supérieur à 80 noeuds, il faut choisir 3 de densité locale, sinon encore une fois, l'algorithme 4 qui retransmet suivant la distance des voisins est le meilleur.
+
 
 ### Figures
 
