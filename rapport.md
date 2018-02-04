@@ -331,7 +331,7 @@ Pour les deux algorithmes, l'economie de rediffusion à fortement augmenté sans
 #### Question 9
 
 Si l'atteignabilité est la priorité, quelquesoit la taille du réseaux, c'est l'algorithme 4 avec l'approche non probabiliste qu'il faut choisir.
-Si en revanche vous souhaitez maximiser les deux, pour un réseaux supérieur à 80 noeuds, il faut choisir 3 de densité locale, sinon encore une fois, l'algorithme 4 qui retransmet suivant la distance des voisins est le meilleur. 
+Si en revanche vous souhaitez maximiser à la foois l'atteignabilité et l'economie de rediffusion, pour un réseau supérieur à 80 noeuds, il faut choisir l'algorithme 3 de densité locale, sinon encore une fois, l'algorithme 4 qui retransmet suivant la distance des voisins est le meilleur.
 
 ### Figures
 
