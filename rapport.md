@@ -357,3 +357,48 @@ Afin de maximiser à la fois Att et Er, il semble logique que la probabilité do
 ## Question 7
 
 Comparé aux algorithmes précedents, c'est pour le moment la solution qui semble la plus optimale et qui offre la meilleure maximisation à la fois de l'atteignabilité et de l'économie de rediffusion, et ce quelquesoit la taille du réseau. Avec un att moyen proche de 100% pour toute taille de réseau, et un er aux alentours de 17%.
+
+Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
+et en utilisant un algorithme probabiliste basé sur la distance émetteur-récepteur.
+
+| Taille du réseau | Att500 Moyen (%) | ER500 Moyen (%) | Ecart-type Att | Ecart-type ER |
+|------------------|------------------|-----------------|----------------|---------------|
+|                20|                98|               19|           11,76|           9,58|
+|                30|               100|               23|            0,00|          10,30|
+|                40|                96|               23|           17,62|           9,74|
+|                50|               100|               21|            0,00|           8,54|
+|                60|               100|               19|            0,00|           7,59|
+|                70|               100|               20|            0,00|           7,69|
+|                80|               100|               18|            0,00|           7,91|
+|                90|               100|               19|            0,00|           7,66|
+|               100|               100|               18|            0,00|           7,27|
+|               120|               100|               17|            0,00|           7,87|
+|               140|               100|               17|            0,00|           6,83|
+|               160|               100|               15|            0,00|           6,68|
+|               180|               100|               15|            0,00|           6,60|
+|               200|               100|               15|            0,00|           6,64|
+
+
+## Question 8
+
+#### Algorithme 4 version non probabiliste (mécanisme de rediffusion)
+
+Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
+et en utilisant un algorithme basé sur la distance émetteur-récepteur avec mécanisme de rediffusion.
+
+| Taille du réseau | Att500 Moyen (%) | ER500 Moyen (%) | Ecart-type Att | Ecart-type ER |
+|------------------|------------------|-----------------|----------------|---------------|
+|                20|               100|               32|            0,00|          10,45|
+|                30|                98|               33|           14,00|           8,63|
+|                40|               100|               34|            0,00|           8,27|
+|                50|               100|               34|            0,00|           7,68|
+|                60|               100|               33|            0,00|           6,67|
+|                70|               100|               32|            0,00|           6,11|
+|                80|               100|               33|            0,00|           6,46|
+|                90|               100|               31|            0,00|           6,03|
+|               100|               100|               32|            0,00|           5,66|
+|               120|               100|               31|            0,00|           5,33|
+|               140|               100|               31|            0,00|           4,79|
+|               160|               100|               30|            0,00|           5,02|
+|               180|               100|               29|            0,00|           4,91|
+|               200|               100|               29|            0,00|           4,46|
