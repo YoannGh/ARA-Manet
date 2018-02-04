@@ -1,5 +1,9 @@
 package solution.exo2;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,17 +87,24 @@ public class GossipControler implements Control{
 			if(currBroadcast < N) {
 				Node initialNode = Network.get(CommonState.r.nextInt(Network.size()));
 				GossipProtocol gp = (GossipProtocol) initialNode.getProtocol(gossip_pid);
-				System.out.println("initializing gossip#" + currBroadcast + " from node " + initialNode.getID());
+				//System.out.println("initializing gossip#" + currBroadcast + " from node " + initialNode.getID());
 				gp.initiateGossip(initialNode, currBroadcast, initialNode.getID());
 				currBroadcast+=1;
 				return false;
 			}
 			else if(currBroadcast == N) {
-				System.out.println("Avgatt = " + totalAtt/att_trace.size()+ "%");
-				System.out.println("Avger = " + totalER/er_trace.size()+ "%");
-				System.out.println("Eatt = " + standardVariationAtt());
-				System.out.println("Eer = " + standardVariationER());
-				System.out.println("Done");
+//				System.out.println("Done");
+//				System.out.println("Avgatt = " + totalAtt/att_trace.size()+ "%");
+//				System.out.println("Avger = " + totalER/er_trace.size()+ "%");
+//				System.out.println("Eatt = " + standardVariationAtt());
+//				System.out.println("Eer = " + standardVariationER());
+				String tmp = "\n|                "+ Network.size() +"|            "+ 0.9 +"|               "+ totalAtt/att_trace.size() +"|";
+				try {
+					Files.write(Paths.get("myfile.txt"), tmp.getBytes(), StandardOpenOption.APPEND);
+				}catch (IOException e) {
+				    System.out.println("failed open log file");
+				}
+				
 				System.exit(1);
 			}
 		}
