@@ -13,7 +13,7 @@ public class EmitterProbability extends EmitterGossip{
 
 	public EmitterProbability(String prefix) {
 		super(prefix);
-		this.probability = Configuration.getDouble(prefix+"."+PAR_PROBABILITY);
+		this.probability = Configuration.getDouble(prefix + "." + PAR_PROBABILITY);
 	}
 
 	//Probability algorithm send in pseudorandomness according to probability parameter

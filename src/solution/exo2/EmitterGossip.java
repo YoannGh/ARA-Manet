@@ -44,7 +44,7 @@ public abstract class EmitterGossip extends EmitterImpl {
 			}
 		}
 		//Emit is called from a node that received the gossip
-		recvGossip+=1;
+		recvGossip += 1;
 	}
 
 	public boolean broadcastDone() {

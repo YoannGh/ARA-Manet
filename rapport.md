@@ -66,15 +66,15 @@ Le SD de la stratégie 2 retourne la position actuelle du noeud. Les noeuds sont
 ```java
 public class EmitterImpl implements Emitter {
 
-	private static final String pp_PID = "positionprotocolimpl";
+	protected static final String pp_PID = "positionprotocolimpl";
 	
 	private static final String PAR_LATENCY="latency";
 	private static final String PAR_SCOPE="scope";
 	
 	private final int my_pid;
 	
-	private int latency;
-	private int scope;
+	protected int latency;
+	protected int scope;
 	
 	public EmitterImpl(String prefix){
 		String tmp[]=prefix.split("\\.");
@@ -90,15 +90,15 @@ public class EmitterImpl implements Emitter {
 		Position positionEmitter = ppEmitter.getCurrentPosition();
 
 		for(int i = 0; i < Network.size(); i++) {
-			Node n = Network.get(i);
-			if(n.getID() != host.getID()) {
-				PositionProtocol ppNode = (PositionProtocol) n.getProtocol(positionprotocol_pid);
-				Position positionNode = ppNode.getCurrentPosition();
-				double distance = Math.hypot(	positionEmitter.getX()-positionNode.getX(),
-												positionEmitter.getY()-positionNode.getY());
+			Node dest = Network.get(i);
+			if (dest.getID() != host.getID()) {
+				PositionProtocol ppDest = (PositionProtocol) dest.getProtocol(positionprotocol_pid);
+				Position positionDest = ppDest.getCurrentPosition();
+				double distance = Math.hypot(	positionEmitter.getX()-positionDest.getX(),
+						positionEmitter.getY()-positionDest.getY());
 
 				if (distance <= scope) {
-					EDSimulator.add(latency, msg, n, msg.getPid());
+					EDSimulator.add(latency, msg, dest, msg.getPid());
 				}
 			}
 		}
@@ -123,7 +123,7 @@ public class EmitterImpl implements Emitter {
 		} catch (CloneNotSupportedException e) {}
 		return res;
 	}
-
+	
 }
 ```
 
@@ -191,15 +191,10 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 			String ev = (String) event;
 			if(ev.equals(DO_HEARTBEAT_EVENT)) {
 
-				for(int i = 0; i < Network.size(); i++) {
-					Node dest = Network.get(i);
-					if(dest.getID() != node.getID()) {
-						Message probeMsg = new Message(node.getID(), dest.getID(), MSG_TAG_PROBE, null, my_pid);
-						Emitter emitter = (Emitter) node.getProtocol(emitter_pid);
-						//Envoi du Probe
-						emitter.emit(node, probeMsg);
-					}
-				}
+				Message probeMsg = new Message(node.getID(), Emitter.ALL, MSG_TAG_PROBE, null, my_pid);
+				EmitterImpl emitter = (EmitterImpl) node.getProtocol(emitter_pid);
+				//Envoi du Probe
+				emitter.emit(node, probeMsg);
 				//Armer l'envoi du prochain Probe
 				EDSimulator.add(probe_period, DO_HEARTBEAT_EVENT, node, my_pid);
 				return;
@@ -337,19 +332,156 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
 ## Question 4
 
+Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
+en utilisant un algorithme de flooding.
+
 | Taille du réseau | Att500 Moyen (%) | ER500 Moyen (%) | Ecart-type Att | Ecart-type ER |
 |------------------|------------------|-----------------|----------------|---------------|
 |                20|             100,0|              0,0|               0|              0|
-|                30|             00,00|             0,21|                |               |
-|                40|             00,00|             0,10|                |               |
-|                50|             00,00|             0,06|                |               |
-|                60|             00,00|             0,09|                |               |
-|                70|             00,00|             0,06|                |               |
-|                80|             00,00|             0,05|                |               |
-|                90|             00,00|             0,04|                |               |
-|               100|             00,00|             0,04|                |               |
-|               120|             00,00|             0,03|                |               |
-|               140|             00,00|             0,02|                |               |
-|               160|             00,00|             0,04|                |               |
-|               180|             00,00|             0,02|                |               |
-|               200|             00,00|             0,02|                |               |
+|                30|             100,0|              0,0|               0|              0|
+|                40|             100,0|              0,0|               0|              0|
+|                50|             100,0|              0,0|               0|              0|
+|                60|             100,0|              0,0|               0|              0|
+|                70|             100,0|              0,0|               0|              0|
+|                80|             100,0|              0,0|               0|              0|
+|                90|             100,0|              0,0|               0|              0|
+|               100|             100,0|              0,0|               0|              0|
+|               120|             100,0|              0,0|               0|              0|
+|               140|             100,0|              0,0|               0|              0|
+|               160|             100,0|              0,0|               0|              0|
+|               180|             100,0|              0,0|               0|              0|
+|               200|             100,0|              0,0|               0|              0|
+
+## Question 5
+
+Évolution de l'atteignabilité en fonction de la densité du réseau en utilisant 
+un algorithme probabiliste.
+
+| Taille du réseau | Probabilité p | Att500 Moyen (%) |
+|------------------|---------------|------------------|
+|                20|            0,2|               4,0|
+|                20|            0,3|              13,0|
+|                20|            0,4|              30,0|
+|                20|            0,5|              44,0|
+|                20|            0,6|              58,0|
+|                20|            0,7|              67,0|
+|                20|            0,8|              78,0|
+|                20|            0,9|              91,0|
+|                20|            1,0|               100|
+|                30|            0,2|              15,0|
+|                30|            0,3|              26,0|
+|                30|            0,4|              35,0|
+|                30|            0,5|              46,0|
+|                30|            0,6|              57,0|
+|                30|            0,7|              71,0|
+|                30|            0,8|              79,0|
+|                30|            0,9|              90,0|
+|                30|            1,0|               100|
+|                40|            0,2|              15,0|
+|                40|            0,3|              26,0|
+|                40|            0,4|              40,0|
+|                40|            0,5|              48,0|
+|                40|            0,6|              61,0|
+|                40|            0,7|              69,0|
+|                40|            0,8|              78,0|
+|                40|            0,9|              86,0|
+|                40|            1,0|               100|
+|                50|            0,2|              14,0|
+|                50|            0,3|              26,0|
+|                50|            0,4|              40,0|
+|                50|            0,5|              47,0|
+|                50|            0,6|              59,0|
+|                50|            0,7|              67,0|
+|                50|            0,8|              81,0|
+|                50|            0,9|              90,0|
+|                50|            1,0|               100|
+|                60|            0,2|              17,0|
+|                60|            0,3|              25,0|
+|                60|            0,4|              39,0|
+|                60|            0,5|              49,0|
+|                60|            0,6|              61,0|
+|                60|            0,7|              73,0|
+|                60|            0,8|              78,0|
+|                60|            0,9|              90,0|
+|                60|            1,0|               100|
+|                70|            0,2|              17,0|
+|                70|            0,3|              31,0|
+|                70|            0,4|              41,0|
+|                70|            0,5|              51,0|
+|                70|            0,6|              60,0|
+|                70|            0,7|              68,0|
+|                70|            0,8|              80,0|
+|                70|            0,9|              91,0|
+|                70|            1,0|               100|
+|                80|            0,2|              16,0|
+|                80|            0,3|              29,0|
+|                80|            0,4|              40,0|
+|                80|            0,5|              49,0|
+|                80|            0,6|              58,0|
+|                80|            0,7|              72,0|
+|                80|            0,8|              77,0|
+|                80|            0,9|              87,0|
+|                80|            1,0|               100|
+|                90|            0,2|              17,0|
+|                90|            0,3|              27,0|
+|                90|            0,4|              41,0|
+|                90|            0,5|              49,0|
+|                90|            0,6|              63,0|
+|                90|            0,7|              70,0|
+|                90|            0,8|              78,0|
+|                90|            0,9|              89,0|
+|                90|            1,0|               100|
+|               100|            0,2|              17,0|
+|               100|            0,3|              27,0|
+|               100|            0,4|              39,0|
+|               100|            0,5|              49,0|
+|               100|            0,6|              58,0|
+|               100|            0,7|              69,0|
+|               100|            0,8|              78,0|
+|               100|            0,9|              90,0|
+|               100|            1,0|               100|
+|               120|            0,2|              14,0|
+|               120|            0,3|              27,0|
+|               120|            0,4|              41,0|
+|               120|            0,5|              49,0|
+|               120|            0,6|              63,0|
+|               120|            0,7|              70,0|
+|               120|            0,8|              82,0|
+|               120|            0,9|              90,0|
+|               120|            1,0|               100|
+|               140|            0,2|              18,0|
+|               140|            0,3|              28,0|
+|               140|            0,4|              36,0|
+|               140|            0,5|              47,0|
+|               140|            0,6|              59,0|
+|               140|            0,7|              66,0|
+|               140|            0,8|              84,0|
+|               140|            0,9|              90,0|
+|               140|            1,0|               100|
+|               160|            0,2|              14,0|
+|               160|            0,3|              28,0|
+|               160|            0,4|              40,0|
+|               160|            0,5|              54,0|
+|               160|            0,6|              60,0|
+|               160|            0,7|              70,0|
+|               160|            0,8|              78,0|
+|               160|            0,9|              89,0|
+|               160|            1,0|               100|
+|               180|            0,2|              17,0|
+|               180|            0,3|              26,0|
+|               180|            0,4|              37,0|
+|               180|            0,5|              52,0|
+|               180|            0,6|              62,0|
+|               180|            0,7|              71,0|
+|               180|            0,8|              81,0|
+|               180|            0,9|              89,0|
+|               180|            1,0|               100|
+|               200|            0,2|              19,0|
+|               200|            0,3|              25,0|
+|               200|            0,4|              38,0|
+|               200|            0,5|              44,0|
+|               200|            0,6|              55,0|
+|               200|            0,7|              68,0|
+|               200|            0,8|              86,0|
+|               200|            0,9|              87,0|
+|               200|            1,0|               100|
