@@ -1,6 +1,16 @@
-# Exercice 1
+# Projet ARA: Simulation de MANET avec PeerSim
 
-## Question 1
+
+Étudiants:
+- Nicolas Guittonneau ()
+- Yoann Ghigoff (3506454)
+
+
+Les figures sont situées en fin de document.
+
+### Exercice 1
+
+#### Question 1
 
 Donnez l'algorithme général de déplacement d'un noeud:
 ```
@@ -9,20 +19,23 @@ Initialement le noeud n'est pas en mouvement.
 move:
 Si le noeud n'est pas en mouvement:
   - calcul aléatoire de la vitesse du noeud
-  - calcul de sa prochaine destination en se basant sur la stratégie de destination
+  - calcul de sa prochaine destination en se basant sur la stratégie de 
+  destination
 
 Calcul de la distance courante restante à parcourir
-Calcul de la distance totale à parcourir par le noeud jusqu'à sa prochaine destination.
+Calcul de la distance totale à parcourir par le noeud jusqu'à sa prochaine 
+destination.
 
 Si le noeud est arrivé à destination:
 	il s'arrête et s'envoit un Event de type pause qui va relancer l'algorithme
 	move après que le temps 'pause' soit écoulé.
 Sinon:
-	Le noeud se déplace vers sa destination et s'envoit un Event pour déclencher son prochain déplacement.
+	Le noeud se déplace vers sa destination et s'envoit un Event pour déclencher 
+	son prochain déplacement.
 ```
 
-## Question 2
-Contenu du fichier config.cfg pour cette question:
+#### Question 2
+Contenu du fichier de configuration Peersim pour cette question:
 ```
 random.seed 6
 network.size 42
@@ -48,220 +61,36 @@ control.graphicalmonitor.step 1
 init.init_module Initialisation
 ```
 
-## Question 3
+#### Question 3
 
 - SD: Stratégie déplacement
 - SPI: Stratégie Position Initiale
 
-Le SD définit une position pseudo aléatoire comprise entre les paramètres width et height définis dans le fichier de config.
+Pour la stratégie 1:
+
+La SD définit une position pseudo aléatoire comprise entre les paramètres width et height définis dans le fichier de config.
 La SPI de la Stratégie 1 appelle simplement le SD avec une vitesse de zéro.
 
 
-## Question 4
+#### Question 4
 
-Le SD de la stratégie 2 retourne la position actuelle du noeud. Les noeuds sont donc statiques.
+La SD de la stratégie 2 retourne la position actuelle du noeud. Les noeuds sont donc statiques.
 
-## Question 5
+#### Question 8
 
-```java
-public class EmitterImpl implements Emitter {
-
-	protected static final String pp_PID = "positionprotocolimpl";
-	
-	private static final String PAR_LATENCY="latency";
-	private static final String PAR_SCOPE="scope";
-	
-	private final int my_pid;
-	
-	protected int latency;
-	protected int scope;
-	
-	public EmitterImpl(String prefix){
-		String tmp[]=prefix.split("\\.");
-		my_pid=Configuration.lookupPid(tmp[tmp.length-1]);
-		this.latency=Configuration.getInt(prefix+"."+PAR_LATENCY);
-		this.scope=Configuration.getInt(prefix+"."+PAR_SCOPE);
-	}
-
-	@Override
-	public void emit(Node host, Message msg) {
-		int positionprotocol_pid = Configuration.lookupPid(pp_PID);
-		PositionProtocol ppEmitter = (PositionProtocol) host.getProtocol(positionprotocol_pid);
-		Position positionEmitter = ppEmitter.getCurrentPosition();
-
-		for(int i = 0; i < Network.size(); i++) {
-			Node dest = Network.get(i);
-			if (dest.getID() != host.getID()) {
-				PositionProtocol ppDest = (PositionProtocol) dest.getProtocol(positionprotocol_pid);
-				Position positionDest = ppDest.getCurrentPosition();
-				double distance = Math.hypot(	positionEmitter.getX()-positionDest.getX(),
-						positionEmitter.getY()-positionDest.getY());
-
-				if (distance <= scope) {
-					EDSimulator.add(latency, msg, dest, msg.getPid());
-				}
-			}
-		}
-	}
-
-	@Override
-	public int getLatency() {
-		return latency;
-	}
-
-	@Override
-	public int getScope() {
-		return scope;
-	}
-	
-	public Object clone(){
-		EmitterImpl res=null;
-		try {
-			res=(EmitterImpl)super.clone();
-			res.latency = latency;
-			res.scope = scope;
-		} catch (CloneNotSupportedException e) {}
-		return res;
-	}
-	
-}
-```
-
-## Question 6
-
-```java
-public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
-
-	public static final String DO_HEARTBEAT_EVENT = "do_heartbeat";
-	public static final String TIMEOUT_EVENT = "timeout";
-
-	public static final String MSG_TAG_PROBE = "probe";
-
-	private static final String PAR_PROBE_PERIOD="probe_period";
-	private static final String PAR_TIMEOUT="timeout";
-	private static final String PAR_EMITTER="emitter";
-	private static final String PAR_NEIGHBOR_LISTENER="neighbor_listener";
-
-	private final int my_pid;
-
-	private int timeout;
-	private long probe_period;
-	private int emitter_pid;
-	private int neightbor_listener_pid;
-
-	private Queue<Message> pending_probes;
-	private Map<Long, Integer> received_probes;
-
-	public NeighborProtocolImpl(String prefix){
-		String tmp[]=prefix.split("\\.");
-		my_pid=Configuration.lookupPid(tmp[tmp.length-1]);
-		this.probe_period=Configuration.getLong(prefix+"."+PAR_PROBE_PERIOD);
-		this.timeout=Configuration.getInt(prefix+"."+PAR_TIMEOUT);
-		this.emitter_pid=Configuration.getPid(prefix+"."+PAR_EMITTER);
-		this.neightbor_listener_pid=Configuration.getPid(prefix+"."+PAR_NEIGHBOR_LISTENER, -1);
-		pending_probes = new LinkedList<>();
-		received_probes = new HashMap<>();
-	}
-
-	@Override
-	public List<Long> getNeighbors() {
-		return new ArrayList<>(received_probes.keySet());
-	}
-
-	public Object clone(){
-		NeighborProtocolImpl res=null;
-		try {
-			res=(NeighborProtocolImpl)super.clone();
-			res.timeout = timeout;
-			res.probe_period = probe_period;
-			res.emitter_pid = emitter_pid;
-			res.neightbor_listener_pid = neightbor_listener_pid;
-			res.pending_probes = new LinkedList<>(pending_probes);
-			res.received_probes = new HashMap<>(received_probes);
-		} catch (CloneNotSupportedException e) {}
-		return res;
-	}
-
-	@Override
-	public void processEvent(Node node, int pid, Object event) {
-		if(pid != my_pid){
-			throw new RuntimeException("Receive Event for wrong protocol");
-		}
-		if(event instanceof String) {
-			String ev = (String) event;
-			if(ev.equals(DO_HEARTBEAT_EVENT)) {
-
-				Message probeMsg = new Message(node.getID(), Emitter.ALL, MSG_TAG_PROBE, null, my_pid);
-				EmitterImpl emitter = (EmitterImpl) node.getProtocol(emitter_pid);
-				//Envoi du Probe
-				emitter.emit(node, probeMsg);
-				//Armer l'envoi du prochain Probe
-				EDSimulator.add(probe_period, DO_HEARTBEAT_EVENT, node, my_pid);
-				return;
-			}
-			//Réception d'un évènement TimeOut
-			else if (ev.equals(TIMEOUT_EVENT)) {
-
-				Message m = pending_probes.poll();
-				if(m != null) {
-					Integer nbTimeout = received_probes.get(m.getIdSrc()) - 1;
-					if(nbTimeout == 0) {
-						received_probes.remove(m.getIdSrc());
-						if(neightbor_listener_pid != -1)
-							((NeighborhoodListener)node.getProtocol(neightbor_listener_pid)).lostNeighborDetected(node, m.getIdSrc());
-					}
-					else if(nbTimeout > 0) {
-						received_probes.put(m.getIdSrc(), nbTimeout);
-					}
-					else {
-						System.err.println("nbTimeOut = null should not happen");
-					}
-				} else {
-					System.err.println("pending_probes was empty during timeout, this should not happen");
-				}
-				return;
-			}
-		}
-		else if(event instanceof Message) {
-			Message msg = (Message) event;
-			if(msg.getIdDest() == node.getID()) {
-				// Réception d'un Probe
-				if (msg.getTag().equals(MSG_TAG_PROBE)) {
-
-					pending_probes.offer(msg);
-					Integer nbTimeout = received_probes.get(msg.getIdSrc());
-					if(nbTimeout == null) {
-						received_probes.put(msg.getIdSrc(), 1);
-						if (neightbor_listener_pid != -1)
-							((NeighborhoodListener) node.getProtocol(neightbor_listener_pid)).newNeighborDetected(node, msg.getIdSrc());
-					} else {
-						received_probes.put(msg.getIdSrc(), nbTimeout + 1);
-					}
-
-					// Armer le prochain TimeOut
-					EDSimulator.add(timeout, TIMEOUT_EVENT, node, my_pid);
-				}
-			}
-			return;
-		}
-		System.err.println("Received unknown event: " + event);
-		throw new RuntimeException("Receive unknown Event");
-	}
-
-}
-```
-
-## Question 8
 - Stratégie 3
 
   Cette SD repose sur le paramètre scope, définissant une zone de deplacements carré centrée sur le milieu de la fenêtre.
-  La taille de la zone est définie par la formule: (scope-20)*2
+  La taille de la zone est définie par la formule: (scope-20)x2 	
   Si scope < 20, la zone est de taille 0, tous les noeuds sont donc statiques au milieux de la fenêtre.
-  Dans le pire des cas, les noeuds peuvent être de part et d'autre de la diagonale du carré, soit à une distance de n*\sqrt{2}, avec n etant la taille d'un coté de la zone.
+  Dans le pire des cas, les noeuds peuvent être de part et d'autre de la diagonale du carré, soit à une distance de n*Sqrt(2), 
+  avec n etant la taille d'un coté de la zone.
   Ce qui revient à résoudre l'inégalité suivante:
-  ((scope-20)*2)*\sqrt{2} < scope
+  ((scope-20)*2)xSqrt(2) < scope
+  
   Après simplification:
   scope < ~30.93
+  
   Le graphe est donc connexe pour un scope de 0 à 30.
 
 - Stratégie 4
@@ -277,7 +106,9 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 
   Cette SPI forme une topologie en "étoile" autour du centre de la fenêtre. L'angle de chaque noeud est calculé en fonction de son ID, et la distance depuis le centre est calculé en fonction du scope et de la taille du réseau, garantissant de générer un graphe connexe.
 
-## Question 10
+#### Question 10
+
+Évolution de la densité en fonction de la portée et de la stratégie utilisée.
 
 
 | portée | SPI | SD | D(t) | E(t) / D(T) | ED(t) / D(T) |
@@ -300,7 +131,7 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 |     875|    3|   3| 25,46|               1,02|                0,07|
 |    1000|    3|   3| 25,19|               1,02|                0,08|
 
-## Question 11
+#### Question 11
 
 - Stratégie 1:
   La taille de la zone étant fixe, l'augmentation de la portée est donc directement proportionnelle avec celle de la densité.
@@ -308,12 +139,14 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
   La taille de la zone de déplacement augmente proportionnellement avec le scope, la densité reste donc constante avec l'augmentation de la portée.
   
   
-# Exercice 2
+### Exercice 2
 
-## Question 1
+#### Question 1
+
+Évolution de la densité en fonction de la taille du réseau.
 
 
-| Taille du réseau | D(t)  | \frac{ED(t)}{D(T)} |
+| Taille du réseau | D(t)  | ED(t) / D(T) |
 |------------------|-------|-------------------|
 |                20|  9,62 |               0,24|
 |                30|  14,18|               0,21|
@@ -330,63 +163,40 @@ public class NeighborProtocolImpl implements NeighborProtocol, EDProtocol {
 |               180|  76,97|               0,02|
 |               200|  81,44|               0,02|
 
-![exo2_q1_dt](graphs/exo2_q1_dt.png)
 
-![exo2_q1_eddt](graphs/exo2_q1_eddt.png)
+_Courbes: Voir figures 1 et 2_
 
-Sans surprise avec une taille du terrain constante, la densité du réseau augmente avec le nombre de noeuds. De même, la variation de la densité diminue avec l'augmentation de la taille du réseau.
-On peut conclure qu'a partir d'un réseau de taille 50, la variation du nombre de voisins reste à peut près constante durant toute la durée d'éxecution du programme.
+Sans surprise avec une taille du terrain constante, la densité du réseau augmente avec le nombre de noeud. De même, la variation de la densité diminue avec l'augmentation de la taille du réseau.
+On peut conclure qu'à partir d'un réseau de taille 50, la variation du nombre de voisins reste à peu près constante durant toute la simulation.
 
-## Question 2
+#### Question 2
 
-Pour detecter la terminaison d'un gossip, il suffit de maintenir deux variables représentant le nombre de messages reçus et le nombre de messages envoyés (de type gossip). Lorsque ces deux variable sont identiques, c'est que tous les messages envoyés on été reçu, et qu'il n'y a donc plus de messages en cours de transmition. Le gossip est donc terminé, on peut alors lancer le suivant.
+Pour détecter la terminaison d'un gossip, il suffit de maintenir deux variables représentant le nombre de messages reçus et le nombre de messages envoyés. Lorsque ces deux variables sont identiques, c'est que tous les messages envoyés ont été reçus, et qu'il n'y a donc plus de messages en cours de transmission. La diffusion est donc terminée, on peut alors lancer la suivante.
 
-## Question 4
+#### Question 4
 
-![exo2_q4_att](graphs/exo2_q4_att.png)
+_Courbes: Voir figures 3 et 4_
 
-![exo2_q4_att](graphs/exo2_q4_er.png)
+L'atteignabilité est de 100% quelque soit la taille du réseau, ce résultat est logique puisque que l'algorithme de flooding retransmet les messages dans tous les cas et le réseau est connexe durant toute la simulation (garantie par SPI_5 et SD_4).
 
-L'atteignabilité est de 100% quelquesoit la taille du réseau, ce résultat est logique vu que l'algorithme de flooding retransmet les messages dans tous les cas et le réseau est connexe durant toute l'execution du programme(garantie par SPI_5 et SD_4) 
+#### Question 5
 
-## Question 5
+_Courbe: Voir figure 5_
 
-![exo2_q5](graphs/exo2_q5.png)
+Pour chaque test, l'économie de rediffusion correspond à la valeur de probabilité donnée en entrée.
+Pour les valeurs de p supérieures à 0.5, la taille du réseau ne semble pas avoir d'impact sur les résultats, en revanche, pour un une probabilité p inférieure, on note une nette amélioration de l'atteignabilité lorsque le réseau dépasse 50 noeuds, taille a partir de laquelle le nombre de voisins est constant, comme démontré à la question 1.
 
-Pour chaque test, l'économie de redifusion correspond à la valeur de probabilité donnée en entrée. 
-Pour les valeurs de p supérieures à 0.5, la taille du réseau ne semble pas avoir d'impacts sur les résultats, en revanche, pour un p inférieurs, on note une nette amélioration de l'atteignabilité lorsque le réseau dépasse 50, taille a partir de laquelle le nombre de voisins est constant, comme démontré à la question 1.
+#### Question 6
 
+_Courbes: Voir figures 6 à 10_
 
-## Question 6
+Afin de maximiser à la fois Att et Er, il semble logique que la probabilité doit être inversement proportionelle à la taille du voisinage, en effet, si la densité est importante, la probabilité qu'un voisin ai reçu le message en même temps que moi est plus élevée. On remarque sur les graphiques que les meilleurs résultats sont dans la fourchette d'une taille de réseau de 40-70 noeuds. Pour des réseaux plus petits, l'atteignabilité est trop faible, dû au fait qu'il n'y ai pas assez de voisins, et pour les réseaux plus grand la rediffusion est trop élévée, dû à la densité trop élévée.
 
-Afin de maximiser à la fois Att et Er, il semble logique que la probabilité doit être inversement proportionelle à la taille du voisinage, en effet, si la densité est importante, la probabilité qu'un voisin ai reçu le message en meme temps que moi est plus élevée. On remarque sur les graphiques que les meilleurs résultats sont dans la fourchette d'une taille de réseau de 40-70 noeuds. Pour des réseaux plus petits, l'atteignabilité est trop faible, due au fait qu'il n'y ai pas assez de voisins, et pour les reseaux plus grand la redifusion est trop élévée, du à la densité trop élévée.
+#### Question 7
 
-Évolution de l'atteignabilité en fonction de la densité du réseau et d'une probabilité inversement
- proportionnelle à la densité.
- 
- 
-![exo2_q6_k1](graphs/exo2_q6_k1.png)
+_Courbe: Voir figure 11_
 
----
- 
-![exo2_q6_k2](graphs/exo2_q6_k2.png)
-
----
-  
-![exo2_q6_k3](graphs/exo2_q6_k3.png)
-
----
-   
-![exo2_q6_k4](graphs/exo2_q6_k4.png)
-
----
-
-![exo2_q6_k5](graphs/exo2_q6_k5.png)
-
-
-## Question 7
-
-Comparé aux algorithmes précedents, c'est pour le moment la solution qui semble la plus optimale et qui offre la meilleure maximisation à la fois de l'atteignabilité et de l'économie de rediffusion, et ce quelquesoit la taille du réseau. Avec un att moyen proche de 100% pour toute taille de réseau, et un er aux alentours de 17%.
+Comparé aux algorithmes précedents, c'est pour le moment la solution qui semble la plus optimale et qui offre la meilleure maximisation à la fois de l'atteignabilité et de l'économie de rediffusion, et ce quelque soit la taille du réseau. Avec une atteignabilité moyenne proche de 100% pour toute taille de réseau, et une économie de rediffusion aux alentours de 17%.
 
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
 et en utilisant un algorithme probabiliste basé sur la distance émetteur-récepteur.
@@ -409,12 +219,9 @@ et en utilisant un algorithme probabiliste basé sur la distance émetteur-réce
 |               200|               100|               15|            0,00|           6,64|
 
 
-![exo2_q7](graphs/exo2_q7.png)
+#### Question 8
 
-
-## Question 8
-
-### Algorithme 3 version non probabiliste (mécanisme de rediffusion)
+##### Algorithme 3 avec mécanisme de rediffusion
 
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau
 et en utilisant un algorithme basé sur la densité locale avec mécanisme de rediffusion.
@@ -492,27 +299,10 @@ et en utilisant un algorithme basé sur la densité locale avec mécanisme de re
 |               180|   5 |                53|               86|
 |               200|   5 |                54|               87|
 
-
-![exo2_q8_algo3_k1](graphs/exo2_q8_algo3_k1.png)
-
----
- 
-![exo2_q8_algo3_k2](graphs/exo2_q8_algo3_k2.png)
-
----
-  
-![exo2_q8_algo3_k3](graphs/exo2_q8_algo3_k3.png)
-
----
-   
-![exo2_q8_algo3_k4](graphs/exo2_q8_algo3_k4.png)
-
----
-
-![exo2_q8_algo3_k5](graphs/exo2_q8_algo3_k5.png)
+_Courbes: Voir figures 12 à 16_
 
 
-#### Algorithme 4 version non probabiliste (mécanisme de rediffusion)
+##### Algorithme 4 avec mécanisme de rediffusion
 
 Évolution de l'atteignabilité et de l'économie de rediffusion en fonction de la densité du réseau 
 et en utilisant un algorithme basé sur la distance émetteur-récepteur avec mécanisme de rediffusion.
@@ -534,5 +324,42 @@ et en utilisant un algorithme basé sur la distance émetteur-récepteur avec m�
 |               180|               100|               29|            0,00|           4,91|
 |               200|               100|               29|            0,00|           4,46|
 
+_Courbe: Voir figure 17_
 
-![exo2_q8_algo4](graphs/exo2_q8_algo4.png)
+#### Question 9
+
+### Figures
+
+![Question 1: Évolution de D(t) en fonction de la taille du réseau](graphs/exo2_q1_dt.png)
+
+![Question 1: Évolution de ED(t)/D(t) en fonction de la taille du réseau](graphs/exo2_q1_eddt.png)
+
+![Question 4: Atteignabilité en fonction de la densité du réseau](graphs/exo2_q4_att.png)
+
+![Q4: Économie de rediffusion en fonction de la densité du réseau](graphs/exo2_q4_er.png)
+
+![Q5: Atteignabilité en fonction de la densité du réseau pour un algorithme probabiliste](graphs/exo2_q5.png)
+
+![Q6: Atteignabilité et économie de rediffusion en fonction de la densité du réseau pour k=1](graphs/exo2_q6_k1.png)
+
+![Q6: Atteignabilité et économie de rediffusion en fonction de la densité du réseau pour k=2](graphs/exo2_q6_k2.png)
+
+![Q6: Atteignabilité et économie de rediffusion en fonction de la densité du réseau pour k=3](graphs/exo2_q6_k3.png)
+
+![Q6: Atteignabilité et économie de rediffusion en fonction de la densité du réseau pour k=4](graphs/exo2_q6_k4.png)
+
+![Q6: Atteignabilité et économie de rediffusion en fonction de la densité du réseau pour k=5](graphs/exo2_q6_k5.png)
+
+![Q7: Atteignabilité et économie de rediffusion en fonction de la densité du réseau pour un algorithme probabiliste basé sur la distance émetteur-récepteur](graphs/exo2_q7.png)
+
+![Q8 Algo 3: Atteignabilité et économie de rediffusion en fonction de la densité du réseau avec mécanisme de rediffusion pour k=1](graphs/exo2_q8_algo3_k1.png)
+
+![Q8 Algo 3: Atteignabilité et économie de rediffusion en fonction de la densité du réseau avec mécanisme de rediffusion pour k=2](graphs/exo2_q8_algo3_k2.png)
+
+![Q8 Algo 3: Atteignabilité et économie de rediffusion en fonction de la densité du réseau avec mécanisme de rediffusion pour k=3](graphs/exo2_q8_algo3_k3.png)
+
+![Q8 Algo 3: Atteignabilité et économie de rediffusion en fonction de la densité du réseau avec mécanisme de rediffusion pour k=4](graphs/exo2_q8_algo3_k4.png)
+
+![Q8 Algo 3: Atteignabilité et économie de rediffusion en fonction de la densité du réseau avec mécanisme de rediffusion pour k=5](graphs/exo2_q8_algo3_k5.png)
+
+![Q8 Algo 4: Atteignabilité et économie de rediffusion en fonction de la densité du réseau avec mécanisme de rediffusion pour un algorithme basé sur la distance émetteur-récepteur avec mécanisme de rediffusion](graphs/exo2_q8_algo4.png)
