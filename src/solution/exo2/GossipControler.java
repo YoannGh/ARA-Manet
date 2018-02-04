@@ -98,12 +98,12 @@ public class GossipControler implements Control{
 				System.out.println("Avger = " + totalER/er_trace.size()+ "%");
 				System.out.println("Eatt = " + standardVariationAtt());
 				System.out.println("Eer = " + standardVariationER());
-				String tmp = "\n|                "+ Network.size() +"|            "+ 0.9 +"|               "+ totalAtt/att_trace.size() +"|";
-				/*try {
+				String tmp = "\n|                "+ Network.size() +"|            "+ 1 +"|               "+ totalAtt/att_trace.size() +"|               " + totalER/er_trace.size() + "|";
+				try {
 					Files.write(Paths.get("myfile.txt"), tmp.getBytes(), StandardOpenOption.APPEND);
 				}catch (IOException e) {
 				    System.out.println("failed open log file");
-				}*/
+				}
 				
 				System.exit(1);
 			}
