@@ -1,3 +1,8 @@
+﻿# Auteurs
+
+- [NicolasGtn](https://github.com/NicolasGtn)
+- [YoannGh](https://github.com/YoannGh)
+
 # Sources
 Les sources du projet sont dans:
 > src/
